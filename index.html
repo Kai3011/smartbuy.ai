@@ -207,6 +207,23 @@
     .store-chip.selected { border-color: #bed7c3; color: var(--green-dark); background: #f2f8f2; }
 
     .results-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin: 1px 1px 13px; }
+    .results-column.live-data > :not(#nearbyStoreResults) { display: none; }
+    .nearby-live-results { display: grid; gap: 12px; }
+    .nearby-live-results[hidden] { display: none; }
+    .nearby-live-results h2 { margin: 0; font-size: 15px; font-weight: 680; }
+    .nearby-live-results #nearbyStoreCount { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .live-results-notice { padding: 13px 15px; border: 1px solid #e7ece4; border-radius: 10px; color: #687168; background: #f8faf6; font-size: 11px; line-height: 1.55; }
+    .live-results-notice strong { display: block; margin-bottom: 3px; color: #3e483f; }
+    .live-store-list { display: grid; gap: 9px; }
+    .live-store-card { display: flex; align-items: center; gap: 12px; padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: #fff; box-shadow: var(--shadow); }
+    .live-store-logo { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; color: var(--green-dark); background: var(--green-pale); font-size: 11px; font-weight: 800; }
+    .live-store-info { flex: 1; min-width: 0; }
+    .live-store-info strong { display: block; color: #354036; font-size: 12px; }
+    .live-store-info span { display: block; margin-top: 4px; color: #7a8379; font-size: 10px; line-height: 1.4; overflow-wrap: anywhere; }
+    .live-store-actions { display: flex; flex: 0 0 auto; flex-direction: column; align-items: flex-end; gap: 7px; }
+    .live-store-distance { color: #677267; font-size: 10px; white-space: nowrap; }
+    .live-store-actions .choose-store-button { width: auto; margin: 0; padding: 8px 10px; font-size: 10px; }
+    .live-store-empty { padding: 22px 14px; border: 1px dashed #dbe2d8; border-radius: 10px; color: #687168; background: #fff; font-size: 12px; text-align: center; }
     .results-head h2 { margin: 0; font-size: 15px; font-weight: 680; letter-spacing: -.25px; }
     .results-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
     .sort-button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; color: #646d64; background: #fff; font-size: 10px; }
@@ -446,11 +463,9 @@
           <div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div>
           <div class="home-stores">
             <span class="home-stores-label" data-i18n="stores">Stores</span>
-            <div class="store-chips" aria-label="Stores included in comparison" data-i18n-aria="storesIncluded">
-              <span class="store-chip selected">ALDI</span>
-              <span class="store-chip selected">Lidl</span>
-              <span class="store-chip selected">REWE</span>
-              <span class="store-chip selected">EDEKA</span>
+            <div class="store-chips" aria-label="Nearby branches are looked up from OpenStreetMap" data-i18n-aria="storesIncluded">
+              <span class="store-chip selected" data-i18n="openStreetMap">OpenStreetMap</span>
+              <span class="store-chip" data-i18n="bielefeldPilot">Bielefeld pilot</span>
             </div>
           </div>
         </section>
@@ -538,8 +553,8 @@
       <section class="welcome">
         <div>
           <div class="eyebrow"><span class="spark" aria-hidden="true">✳</span> <span data-i18n="shoppingResults">Your shopping results</span></div>
-          <h1 data-i18n="bestBasketHeadline">Here's your best basket</h1>
-          <p data-i18n="comparedNearby">We compared your list at nearby supermarkets.</p>
+          <h1 id="resultsHeadline" data-i18n="bestBasketHeadline">Here's your best basket</h1>
+          <p id="resultsIntro" data-i18n="comparedNearby">We compared your list at nearby supermarkets.</p>
         </div>
         <button class="sort-button edit-list-button" type="button" id="editListButton" data-i18n="editShoppingList">← Edit shopping list</button>
       </section>
@@ -569,6 +584,18 @@
         </section>
 
         <section class="results-column" id="results" aria-labelledby="resultsTitle">
+          <section class="nearby-live-results" id="nearbyStoreResults" aria-labelledby="nearbyStoreHeading" hidden>
+            <div>
+              <h2 id="nearbyStoreHeading" data-i18n="nearbyStoreHeading">Nearby supermarkets</h2>
+              <p id="nearbyStoreCount"></p>
+            </div>
+            <div class="live-results-notice">
+              <strong data-i18n="pricesNotConnected">Current prices are not connected yet</strong>
+              <span data-i18n="liveDataDisclosure">Store locations come from OpenStreetMap. No shopping-list items are sent to its services. Prices will appear here once an authorized retailer feed is connected.</span>
+            </div>
+            <div class="live-store-list" id="nearbyStoreList"></div>
+            <div class="footer-note" id="liveMapAttribution">Map data © OpenStreetMap contributors</div>
+          </section>
           <div class="results-head">
             <div>
               <h2 id="resultsTitle" data-i18n="bestMatch">Best match for your basket</h2>
@@ -670,7 +697,7 @@
               <div>
                 <div class="address-label" data-i18n="storeAddress">Store address</div>
                 <div class="address-text" id="selectedStoreAddress"></div>
-                <div class="address-note" data-i18n="illustrativeAddress">Illustrative address for this demo</div>
+                <div class="address-note" id="selectedAddressNote" data-i18n="illustrativeAddress">Illustrative address for this demo</div>
               </div>
             </div>
             <a class="directions-button" id="directionsLink" href="#" target="_blank" rel="noopener noreferrer">
@@ -681,7 +708,7 @@
             <div class="store-summary-price">
               <div class="address-label" data-i18n="estimatedTotal">Estimated total for your basket</div>
               <div class="price" id="selectedStorePrice"></div>
-              <p data-i18n="samplePriceClickdummy">Sample price for this clickdummy</p>
+              <p id="summaryPriceNote" data-i18n="samplePriceClickdummy">Sample price for this clickdummy</p>
             </div>
           </article>
           <article class="card selected-basket-card">
@@ -704,18 +731,19 @@
       en: {
         howItWorks: "How it works", personalAssistant: "Your personal shopping assistant", heroLine1: "Good groceries.", heroLine2: "Better prices.",
         shoppingListLabel: "Shopping list items", notifications: "Notifications", selectLanguage: "Select language",
-        heroDescription: "Your list, compared. SmartBuy checks nearby supermarket prices and helps you find the best total for your weekly shop.",
-        lessChecking: "Less price-checking, more saving.", startList: "Start with your shopping list", whatNeed: "What do you need this week?",
-        onePerLine: "One item per line — quantities welcome", findPrices: "Find my best prices", comparingAround: "Comparing around",
-        stores: "Stores", storesIncluded: "Stores included in comparison", howSmartBuyWorks: "How SmartBuy works", makeList: "Make your list",
-        addGroceries: "Add the groceries you need, quantities included.", compareNearby: "We compare nearby",
-        basketTotals: "See basket totals across local supermarkets.", chooseBestBasket: "Choose your best basket",
-        findStoreBudget: "Find a store that fits your list and your budget.", smarterGroceryRun: "Your smarter grocery run",
+        heroDescription: "Enter your list and SmartBuy will find nearby supermarket branches. Live prices will appear once a retailer data source is connected.",
+        lessChecking: "Nearby branches first; price comparison is next.", startList: "Start with your shopping list", whatNeed: "What do you need this week?",
+        onePerLine: "One item per line — quantities welcome", findPrices: "Find nearby supermarkets", comparingAround: "Comparing around",
+        stores: "Stores", storesIncluded: "Nearby branches are looked up from OpenStreetMap", openStreetMap: "OpenStreetMap", bielefeldPilot: "Bielefeld pilot",
+        howSmartBuyWorks: "How SmartBuy works", makeList: "Make your list",
+        addGroceries: "Add the groceries you need, quantities included.", compareNearby: "Find nearby branches",
+        basketTotals: "Current prices need an authorized retailer data source.", chooseBestBasket: "Choose a nearby supermarket",
+        findStoreBudget: "See which branches are nearby; prices are not available yet.", smarterGroceryRun: "Your smarter grocery run",
         workspace: "Workspace", mainNavigation: "Main navigation", dashboard: "Dashboard", myShoppingList: "My shopping list",
         priceComparisons: "Price comparisons", nearbyStores: "Nearby stores", smarterEveryShop: "A little smarter, every shop",
-        compareFullBasket: "We compare your full basket, so you can spend less time price-checking.", freePlan: "Free plan",
-        priceComparison: "Price comparison", shoppingResults: "Your shopping results", bestBasketHeadline: "Here's your best basket",
-        comparedNearby: "We compared your list at nearby supermarkets.", editShoppingList: "← Edit shopping list", yourBasket: "Your basket",
+        compareFullBasket: "We start by finding nearby supermarket branches around your location.", freePlan: "Free plan",
+        priceComparison: "Nearby supermarkets", shoppingResults: "Your shopping results", bestBasketHeadline: "Supermarkets nearby",
+        comparedNearby: "Nearby supermarket branches are shown below.", editShoppingList: "← Edit shopping list", yourBasket: "Your basket",
         itemsInComparison: "Items in this comparison", itemsBeingCompared: "Items being compared", editList: "Edit list",
         looseBananas: "loose bananas", groundCoffee: "ground roasted coffee", butterToast: "butter toast", wheatToast: "wheat toast",
         comparingStores: "Comparing stores near you", bestMatch: "Best match for your basket", lowestTotal: "Lowest total",
@@ -737,7 +765,7 @@
         demoTravelNote: "Store address and prices are illustrative demo data. Check the destination in Maps before travelling.",
         changeLocation: "Change shopping location", locationPrompt: "Enter your city or postal code:", addItemError: "Add at least one item to your list to compare prices.",
         locationFieldLabel: "Your shopping location", locationPlaceholder: "City, postal code, or address",
-        saveLocation: "Save location", useCurrentLocation: "Use my current location", locationDemoNote: "Your browser will ask permission to share your location. Store matches and prices are sample data.",
+        saveLocation: "Save location", useCurrentLocation: "Use my current location", locationDemoNote: "Nearby-store search sends your location to OpenStreetMap services, but not your shopping list. Retailer prices are not connected yet.",
         locationRequired: "Enter a city, postal code, or address first.", locationSaved: "Shopping location set to {location}.",
         locating: "Finding your location…", currentLocationSet: "Current location set to {coordinates}.",
         geolocationUnavailable: "Location is not available in this browser.", locationPermissionDenied: "Location permission was denied. You can enter a location manually instead.",
@@ -746,7 +774,17 @@
         locationUnknownError: "Something went wrong while getting your location. Please try again.",
         locationNeedsSecureContext: "Location access requires a secure page (HTTPS) or localhost.",
         gpsPrefix: "GPS", gpsDirectionsOrigin: "Your current GPS coordinates",
-        scanning: "Scanning nearby stores…", scanningComplete: "Done! Compared {count} {items} at 4 nearby stores.",
+        nearbyStoreHeading: "Nearby supermarkets", liveResultsHeadline: "Nearby supermarket branches",
+        liveResultsIntro: "Nearby branches are listed below; current product prices are not available yet.",
+        nearbySearchComplete: "Found {stores} nearby supermarkets for your list of {count} {items}.",
+        pricesNotConnected: "Current prices are not connected yet",
+        liveDataDisclosure: "Store locations come from OpenStreetMap. No shopping-list items are sent to its services. Prices will appear here once an authorized retailer feed is connected.",
+        branchCountOne: "{count} supermarket found within {radius} km.", branchCountMany: "{count} supermarkets found within {radius} km.",
+        noNearbyStores: "No supermarkets found within {radius} km. Try a larger radius or another nearby location.",
+        distanceAway: "{distance} km away", addressUnavailable: "Address not available", osmAddressNote: "Branch location from OpenStreetMap",
+        retailerPricesPending: "Retailer prices are not connected yet", comparisonFailed: "Nearby stores could not be loaded: {details}",
+        osmAttribution: "Map data © OpenStreetMap contributors",
+        scanning: "Searching nearby supermarkets…", scanningComplete: "Done! Compared {count} {items} at {stores} nearby stores.",
         item: "item", items: "items", resultsHeadingBasket: "Best match for your basket", resultsHeadingItem: "Best match for your item",
         resultsFoundOne: "We found 4 stores with your item nearby.", resultsFoundMany: "We found 4 stores with your items nearby.",
         locationUpdated: "Location updated to {location}. Scan again to compare nearby stores.",
@@ -755,19 +793,20 @@
       },
       de: {
         howItWorks: "So funktioniert's", personalAssistant: "Dein persönlicher Einkaufsassistent", heroLine1: "Gut einkaufen.",
-        heroLine2: "Weniger zahlen.", heroDescription: "Deine Einkaufsliste im Preisvergleich. SmartBuy vergleicht Supermärkte in deiner Nähe und findet den günstigsten Gesamtpreis.",
-        lessChecking: "Weniger Preise vergleichen, mehr sparen.", startList: "Erstelle deine Einkaufsliste", whatNeed: "Was brauchst du diese Woche?",
-        onePerLine: "Ein Artikel pro Zeile — Mengenangaben möglich", findPrices: "Günstigste Preise finden", comparingAround: "Preisvergleich in",
-        stores: "Märkte", storesIncluded: "Märkte im Preisvergleich", howSmartBuyWorks: "So funktioniert SmartBuy", makeList: "Einkaufsliste erstellen",
-        addGroceries: "Füge benötigte Artikel und Mengen hinzu.", compareNearby: "Preise in deiner Nähe",
-        basketTotals: "Vergleiche Warenkorbpreise lokaler Supermärkte.", chooseBestBasket: "Günstigsten Markt finden",
-        findStoreBudget: "Finde den passenden Markt für deine Liste und dein Budget.", smarterGroceryRun: "Cleverer einkaufen",
+        heroLine2: "Weniger zahlen.", heroDescription: "Gib deine Einkaufsliste ein und SmartBuy findet Supermärkte in deiner Nähe. Aktuelle Preise folgen, sobald eine Händler-Datenquelle angebunden ist.",
+        lessChecking: "Erst Märkte in der Nähe, dann der Preisvergleich.", startList: "Erstelle deine Einkaufsliste", whatNeed: "Was brauchst du diese Woche?",
+        onePerLine: "Ein Artikel pro Zeile — Mengenangaben möglich", findPrices: "Supermärkte in der Nähe finden", comparingAround: "Preisvergleich in",
+        stores: "Märkte", storesIncluded: "Marktstandorte werden über OpenStreetMap gesucht", openStreetMap: "OpenStreetMap", bielefeldPilot: "Pilotgebiet Bielefeld",
+        howSmartBuyWorks: "So funktioniert SmartBuy", makeList: "Einkaufsliste erstellen",
+        addGroceries: "Füge benötigte Artikel und Mengen hinzu.", compareNearby: "Märkte in der Nähe finden",
+        basketTotals: "Aktuelle Preise benötigen eine autorisierte Händler-Datenquelle.", chooseBestBasket: "Supermarkt in der Nähe auswählen",
+        findStoreBudget: "Sieh dir Märkte in der Nähe an; Preise sind noch nicht verfügbar.", smarterGroceryRun: "Cleverer einkaufen",
         shoppingListLabel: "Artikel auf der Einkaufsliste", notifications: "Benachrichtigungen", selectLanguage: "Sprache auswählen",
         workspace: "Arbeitsbereich", mainNavigation: "Hauptnavigation", dashboard: "Übersicht", myShoppingList: "Meine Einkaufsliste",
         priceComparisons: "Preisvergleiche", nearbyStores: "Märkte in der Nähe", smarterEveryShop: "Bei jedem Einkauf cleverer",
-        compareFullBasket: "Wir vergleichen deinen gesamten Warenkorb, damit du weniger Zeit mit der Preissuche verbringst.", freePlan: "Kostenloser Tarif",
-        priceComparison: "Preisvergleich", shoppingResults: "Deine Suchergebnisse", bestBasketHeadline: "Hier ist dein günstigster Warenkorb",
-        comparedNearby: "Wir haben deine Liste bei Supermärkten in der Nähe verglichen.", editShoppingList: "← Einkaufsliste bearbeiten",
+        compareFullBasket: "Wir finden zuerst Supermärkte in deiner Nähe.", freePlan: "Kostenloser Tarif",
+        priceComparison: "Supermärkte in der Nähe", shoppingResults: "Deine Suchergebnisse", bestBasketHeadline: "Supermärkte in deiner Nähe",
+        comparedNearby: "Unten findest du Supermärkte in deiner Nähe.", editShoppingList: "← Einkaufsliste bearbeiten",
         yourBasket: "Dein Warenkorb", itemsInComparison: "Artikel in diesem Preisvergleich", itemsBeingCompared: "Verglichene Artikel",
         looseBananas: "lose Bananen", groundCoffee: "gemahlener Röstkaffee", butterToast: "Buttertoast", wheatToast: "Weizentoast",
         editList: "Liste bearbeiten", comparingStores: "Märkte in deiner Nähe im Vergleich", bestMatch: "Bester Treffer für deinen Warenkorb",
@@ -795,7 +834,7 @@
         changeLocation: "Standort ändern", locationPrompt: "Stadt oder Postleitzahl eingeben:",
         locationFieldLabel: "Dein Einkaufsstandort", locationPlaceholder: "Stadt, Postleitzahl oder Adresse",
         saveLocation: "Standort speichern", useCurrentLocation: "Meinen aktuellen Standort verwenden",
-        locationDemoNote: "Dein Browser fragt nach der Standortfreigabe. Marktangebote und Preise sind Beispieldaten.",
+        locationDemoNote: "Die Suche nach Märkten sendet deinen Standort an OpenStreetMap-Dienste, nicht aber deine Einkaufsliste. Händlerpreise sind noch nicht angebunden.",
         locationRequired: "Gib zuerst eine Stadt, Postleitzahl oder Adresse ein.", locationSaved: "Einkaufsstandort auf {location} gesetzt.",
         locating: "Standort wird ermittelt …", currentLocationSet: "Aktueller Standort: {coordinates}.",
         geolocationUnavailable: "Die Standortbestimmung ist in diesem Browser nicht verfügbar.",
@@ -805,8 +844,18 @@
         locationUnknownError: "Beim Abrufen deines Standorts ist ein Fehler aufgetreten. Bitte erneut versuchen.",
         locationNeedsSecureContext: "Der Standortzugriff erfordert eine sichere Seite (HTTPS) oder localhost.",
         gpsPrefix: "GPS", gpsDirectionsOrigin: "Deine aktuellen GPS-Koordinaten",
-        addItemError: "Füge mindestens einen Artikel hinzu, um Preise zu vergleichen.", scanning: "Märkte in der Nähe werden verglichen …",
-        scanningComplete: "Fertig! {count} {items} bei 4 Märkten in der Nähe verglichen.",
+        nearbyStoreHeading: "Supermärkte in der Nähe", liveResultsHeadline: "Supermärkte in deiner Nähe",
+        liveResultsIntro: "Unten findest du Märkte in der Nähe; aktuelle Produktpreise sind noch nicht verfügbar.",
+        nearbySearchComplete: "{stores} Supermärkte in der Nähe für deine Liste mit {count} {items} gefunden.",
+        pricesNotConnected: "Aktuelle Preise sind noch nicht angebunden",
+        liveDataDisclosure: "Marktstandorte stammen von OpenStreetMap. Einkaufslisten werden nicht an deren Dienste gesendet. Preise erscheinen hier, sobald ein autorisierter Händler-Datenfeed angebunden ist.",
+        branchCountOne: "{count} Supermarkt im Umkreis von {radius} km gefunden.", branchCountMany: "{count} Supermärkte im Umkreis von {radius} km gefunden.",
+        noNearbyStores: "Im Umkreis von {radius} km wurden keine Supermärkte gefunden. Versuche einen größeren Umkreis oder einen anderen Standort.",
+        distanceAway: "{distance} km entfernt", addressUnavailable: "Adresse nicht verfügbar", osmAddressNote: "Marktstandort von OpenStreetMap",
+        retailerPricesPending: "Händlerpreise sind noch nicht angebunden", comparisonFailed: "Märkte in der Nähe konnten nicht geladen werden: {details}",
+        osmAttribution: "Kartendaten © OpenStreetMap-Mitwirkende",
+        addItemError: "Füge mindestens einen Artikel hinzu, um Preise zu vergleichen.", scanning: "Supermärkte in der Nähe werden gesucht …",
+        scanningComplete: "Fertig! {count} {items} bei {stores} Märkten in der Nähe verglichen.",
         item: "Artikel", items: "Artikel", resultsHeadingBasket: "Bester Treffer für deinen Warenkorb",
         resultsHeadingItem: "Bester Treffer für deinen Artikel", resultsFoundOne: "Wir haben 4 Märkte in deiner Nähe für deinen Artikel gefunden.",
         resultsFoundMany: "Wir haben 4 Märkte in deiner Nähe für deine Artikel gefunden.",
@@ -818,6 +867,8 @@
 
     let activeLanguage = localStorage.getItem("smartbuy-language") === "de" ? "de" : "en";
     let resultsMessage = { type: "found" };
+    let liveComparison = null;
+    let liveStores = [];
     const sampleLists = {
       en: "5 Bananas\n1 Coffee\n1 Bread",
       de: "5 Bananen\n1 Kaffee\n1 Brot"
@@ -865,6 +916,10 @@
         }
       }
     };
+
+    function getStore(storeId) {
+      return stores[storeId] || liveStores.find((store) => store.id === storeId) || null;
+    }
 
     function getItems() {
       return shoppingList.value.split("\n").map((item) => item.trim()).filter(Boolean);
@@ -925,9 +980,14 @@
 
       if (document.body.classList.contains("store-view")) {
         const selectedStoreId = window.history.state?.storeId || window.location.hash.match(/^#store-(.+)$/)?.[1];
-        if (selectedStoreId && stores[selectedStoreId]) renderStoreSummary(selectedStoreId);
+        if (selectedStoreId && getStore(selectedStoreId)) renderStoreSummary(selectedStoreId);
       } else if (document.body.classList.contains("results-view")) {
         document.querySelector("#breadcrumbCurrent").textContent = text("priceComparison");
+      }
+      if (liveComparison) {
+        renderNearbyStoreResults(liveComparison);
+        document.querySelector("#resultsHeadline").textContent = text("liveResultsHeadline");
+        document.querySelector("#resultsIntro").textContent = text("liveResultsIntro");
       }
     }
 
@@ -966,7 +1026,7 @@
     function getProductMatch(item, storeId) {
       const { name, quantity } = splitRequestedItem(item);
       const category = productCategories.find((candidate) => candidate.matches.test(name));
-      const product = category ? stores[storeId].products[category.key] : null;
+      const product = category ? stores[storeId]?.products[category.key] : null;
       const quantityValue = quantity ? Number.parseFloat(quantity.replace(",", ".")) : 1;
       const lineTotalCents = product ? Math.round(product.priceCents * (Number.isFinite(quantityValue) ? quantityValue : 1)) : null;
       return {
@@ -983,12 +1043,86 @@
     }
 
     function getBasketTotal(storeId) {
+      if (!stores[storeId]) return { cents: null, unavailableCount: getItems().length };
       const matches = getItems().map((item) => getProductMatch(item, storeId));
       const unavailableCount = matches.filter((match) => !match.matched).length;
       return {
         cents: unavailableCount ? null : matches.reduce((total, match) => total + match.lineTotalCents, 0),
         unavailableCount
       };
+    }
+
+    function renderNearbyStoreResults(result) {
+      liveComparison = result;
+      liveStores = result.stores;
+      const resultsColumn = document.querySelector("#results");
+      const resultsSection = document.querySelector("#nearbyStoreResults");
+      const storeList = document.querySelector("#nearbyStoreList");
+      resultsColumn.classList.add("live-data");
+      resultsColumn.setAttribute("aria-labelledby", "nearbyStoreHeading");
+      resultsSection.hidden = false;
+      document.querySelector("#nearbyStoreCount").textContent = text(liveStores.length === 1 ? "branchCountOne" : "branchCountMany", {
+        count: liveStores.length,
+        radius: (result.radiusMeters / 1000).toLocaleString(activeLanguage === "de" ? "de-DE" : "en-IE")
+      });
+      document.querySelector("#liveMapAttribution").textContent = text("osmAttribution");
+      storeList.replaceChildren();
+      if (liveStores.length === 0) {
+        const emptyState = document.createElement("div");
+        emptyState.className = "live-store-empty";
+        emptyState.textContent = text("noNearbyStores", {
+          radius: (result.radiusMeters / 1000).toLocaleString(activeLanguage === "de" ? "de-DE" : "en-IE")
+        });
+        storeList.append(emptyState);
+      } else {
+        for (const store of liveStores) {
+          const card = document.createElement("article");
+          card.className = "live-store-card";
+          const logo = document.createElement("span");
+          logo.className = "live-store-logo";
+          logo.setAttribute("aria-hidden", "true");
+          logo.textContent = store.brand.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").slice(0, 2).toLocaleUpperCase();
+          const info = document.createElement("span");
+          info.className = "live-store-info";
+          const name = document.createElement("strong");
+          name.textContent = store.name;
+          const address = document.createElement("span");
+          address.textContent = store.address || text("addressUnavailable");
+          info.append(name, address);
+          const actions = document.createElement("span");
+          actions.className = "live-store-actions";
+          const distance = document.createElement("span");
+          distance.className = "live-store-distance";
+          distance.textContent = text("distanceAway", {
+            distance: (store.distanceMeters / 1000).toLocaleString(activeLanguage === "de" ? "de-DE" : "en-IE", {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1
+            })
+          });
+          const chooseButton = document.createElement("button");
+          chooseButton.type = "button";
+          chooseButton.className = "choose-store-button";
+          chooseButton.dataset.store = store.id;
+          chooseButton.textContent = `${text("choose")} ${store.name}`;
+          actions.append(distance, chooseButton);
+          card.append(logo, info, actions);
+          storeList.append(card);
+        }
+      }
+      const chips = document.querySelector("#shopping-list .store-chips");
+      chips.replaceChildren();
+      for (const store of liveStores) {
+        const chip = document.createElement("span");
+        chip.className = "store-chip selected";
+        chip.textContent = store.brand;
+        chips.append(chip);
+      }
+      sessionStorage.setItem("smartbuy-nearby-stores", JSON.stringify(result));
+      document.querySelector("#resultsTitle").textContent = text(
+        getItems().length === 1 ? "resultsHeadingItem" : "resultsHeadingBasket"
+      );
+      document.querySelector("#resultsHeadline").textContent = text("liveResultsHeadline");
+      document.querySelector("#resultsIntro").textContent = text("liveResultsIntro");
     }
 
     function renderProductComparisons() {
@@ -1085,9 +1219,10 @@
     function renderResultsDescription() {
       const description = document.querySelector("#resultsDescription");
       if (resultsMessage.type === "complete") {
-        description.textContent = text("scanningComplete", {
+        description.textContent = text(resultsMessage.stores === undefined ? "scanningComplete" : "nearbySearchComplete", {
           count: resultsMessage.count,
-          items: resultsMessage.count === 1 ? text("item") : text("items")
+          items: resultsMessage.count === 1 ? text("item") : text("items"),
+          stores: resultsMessage.stores ?? 4
         });
       } else if (resultsMessage.type === "location") {
         description.textContent = text("locationUpdated", { location: resultsMessage.location });
@@ -1128,19 +1263,28 @@
     }
 
     function renderStoreSummary(storeId) {
-      const store = stores[storeId];
+      const store = getStore(storeId);
       if (!store) return;
 
       const logo = document.querySelector("#selectedStoreLogo");
-      logo.className = `store-logo ${store.logoClass}`;
-      logo.textContent = store.logo;
+      logo.className = `store-logo ${store.logoClass || ""}`;
+      logo.textContent = store.logo || store.brand;
       document.querySelector("#selectedStoreName").textContent = store.name;
-      document.querySelector("#selectedStoreAddress").textContent = store.address;
+      document.querySelector("#selectedStoreAddress").textContent = store.address || text("addressUnavailable");
+      const isLiveStore = !stores[storeId];
+      document.querySelector("#selectedAddressNote").textContent = text(isLiveStore ? "osmAddressNote" : "illustrativeAddress");
+      document.querySelector("#summaryPriceNote").textContent = text(isLiveStore ? "retailerPricesPending" : "samplePriceClickdummy");
       const basketTotal = getBasketTotal(storeId);
       document.querySelector("#selectedStorePrice").textContent = basketTotal.cents === null
         ? text("priceUnavailable")
         : formatCurrency(basketTotal.cents);
-      document.querySelector("#directionsLink").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.mapQuery)}`;
+      const destination = store.latitude !== undefined && store.longitude !== undefined
+        ? `${store.latitude},${store.longitude}`
+        : store.mapQuery;
+      document.querySelector("#directionsLink").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
+      document.querySelectorAll(".selected-basket-card .summary-demo-note").forEach((note) => {
+        note.hidden = isLiveStore;
+      });
       document.querySelector("#selectedBasketCount").textContent = text("selectedItems", {
         count: getItems().length,
         items: getItems().length === 1 ? text("item") : text("items")
@@ -1199,17 +1343,21 @@
     }
 
     function selectStore(storeId, updateHistory = true) {
-      if (!stores[storeId]) return;
+      if (!getStore(storeId)) return;
       renderStoreSummary(storeId);
       showView("store", updateHistory, storeId);
     }
 
     shoppingList.addEventListener("input", updateItemCount);
+    document.querySelector("#nearbyStoreList").addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-store]");
+      if (button) selectStore(button.dataset.store);
+    });
     selectedBasketSummary.addEventListener("change", (event) => {
       const checkbox = event.target;
       if (!(checkbox instanceof HTMLInputElement) || checkbox.type !== "checkbox") return;
       const storeId = window.history.state?.storeId || window.location.hash.match(/^#store-(.+)$/)?.[1];
-      if (!storeId || !stores[storeId]) return;
+      if (!storeId || !getStore(storeId)) return;
       const rowIndex = [...selectedBasketSummary.querySelectorAll('input[type="checkbox"]')].indexOf(checkbox);
       const item = getItems()[rowIndex];
       if (item === undefined) return;
@@ -1219,7 +1367,7 @@
       updateChecklistProgress();
     });
 
-    scanButton.addEventListener("click", () => {
+    scanButton.addEventListener("click", async () => {
       const items = getItems();
       if (items.length === 0) {
         scanStatus.textContent = text("addItemError");
@@ -1230,15 +1378,44 @@
       scanButton.disabled = true;
       scanButton.innerHTML = `<span class="loading-dot" aria-hidden="true">◌</span> ${text("scanning")}`;
       scanStatus.textContent = "";
-      window.setTimeout(() => {
-        scanButton.disabled = false;
-        scanButton.innerHTML = `${scanButtonIcon}<span data-i18n="findPrices">${text("findPrices")}</span>`;
-        updateItemCount();
-        document.querySelector("#resultsTitle").textContent = text(items.length === 1 ? "resultsHeadingItem" : "resultsHeadingBasket");
-        resultsMessage = { type: "complete", count: items.length };
+      try {
+        const storedCoordinates = localStorage.getItem("smartbuy-coordinates");
+        let coordinates = null;
+        if (storedCoordinates) {
+          try {
+            coordinates = JSON.parse(storedCoordinates);
+          } catch {
+            throw new Error("Saved GPS coordinates are invalid. Please set your location again.");
+          }
+        }
+        const response = await fetch("/api/compare", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            items,
+            location: localStorage.getItem("smartbuy-location") || "Bielefeld, Germany",
+            coordinates,
+            radiusMeters: 5000
+          })
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || `Request failed with status ${response.status}.`);
+        if (!Array.isArray(payload.stores) || !Number.isFinite(payload.radiusMeters)) {
+          throw new Error("The nearby-store service returned an invalid response.");
+        }
+        renderNearbyStoreResults(payload);
+        resultsMessage = { type: "complete", count: items.length, stores: payload.stores.length };
         renderResultsDescription();
         showView("results");
-      }, 1100);
+      } catch (error) {
+        console.error("Nearby supermarket search failed:", error);
+        scanStatus.textContent = text("comparisonFailed", {
+          details: error instanceof Error ? error.message : "Unknown error."
+        });
+      } finally {
+        scanButton.disabled = false;
+        scanButton.innerHTML = `${scanButtonIcon}<span data-i18n="findPrices">${text("findPrices")}</span>`;
+      }
     });
 
     document.querySelectorAll("[data-view]").forEach((link) => {
@@ -1363,9 +1540,23 @@
       });
     });
 
+    const cachedResults = sessionStorage.getItem("smartbuy-nearby-stores");
+    if (cachedResults) {
+      try {
+        const parsedResult = JSON.parse(cachedResults);
+        if (parsedResult && Array.isArray(parsedResult.stores) && parsedResult.stores.every((store) => store && typeof store.id === "string" && typeof store.name === "string")) {
+          liveComparison = parsedResult;
+          liveStores = parsedResult.stores;
+          resultsMessage = { type: "complete", count: getItems().length, stores: liveStores.length };
+        }
+      } catch (error) {
+        console.error("Saved nearby supermarket data could not be read:", error);
+        sessionStorage.removeItem("smartbuy-nearby-stores");
+      }
+    }
     updateItemCount();
     window.addEventListener("popstate", (event) => {
-      if (event.state?.view === "store" && stores[event.state.storeId]) {
+      if (event.state?.view === "store" && getStore(event.state.storeId)) {
         renderStoreSummary(event.state.storeId);
         showView("store", false);
       } else {
@@ -1375,7 +1566,7 @@
     });
     if (window.location.hash === "#results") showView("results", false);
     const initialStore = window.location.hash.match(/^#store-(.+)$/)?.[1];
-    if (initialStore && stores[initialStore]) selectStore(initialStore, false);
+    if (initialStore && getStore(initialStore)) selectStore(initialStore, false);
     applyLanguage();
   </script>
 </body>
