@@ -43,8 +43,8 @@
     }
     .home-header .brand { padding: 0; }
     .home-header-right { display: flex; align-items: center; gap: 19px; }
-    .language-button { padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; color: #515b51; background: #fff; font-size: 10px; font-weight: 700; }
-    .language-button:hover { border-color: #b8cdbb; color: var(--green-dark); }
+    .language-select { min-height: 33px; padding: 6px 26px 6px 9px; border: 1px solid var(--line); border-radius: 7px; color: #515b51; background: #fff; font: inherit; font-size: 10px; font-weight: 650; cursor: pointer; }
+    .language-select:hover, .language-select:focus-visible { border-color: #b8cdbb; outline-color: var(--green); }
     .home-nav-link { color: #687168; font-size: 12px; font-weight: 570; text-decoration: none; }
     .home-nav-link:hover { color: var(--green); }
     .home-main { width: min(1080px, calc(100% - 64px)); margin: 0 auto; padding: 48px 0 35px; }
@@ -60,15 +60,30 @@
     .proof-avatars span:nth-child(2) { background: #d2956e; }
     .proof-avatars span:nth-child(3) { background: #8a9fb4; }
     .home-list-card { padding: 23px; border-color: #e3e9df; box-shadow: 0 18px 48px rgba(31, 52, 34, .085); }
+    .home-list-card .home-location-panel { margin-top: 0; padding-top: 0; padding-bottom: 16px; border-top: 0; border-bottom: 1px solid var(--line); }
+    .home-list-card .location-demo-note { line-height: 1.4; }
     .home-list-card .card-heading h2 { font-size: 16px; }
     .home-list-card textarea { min-height: 143px; background: #fff; }
     .home-list-card .scan-button { margin-top: 15px; padding: 14px; font-size: 13px; }
     .home-list-card .scan-status { min-height: 0; }
     .home-list-card .editor-hint { margin-top: 8px; }
-    .home-location-row { display: flex; align-items: center; justify-content: space-between; margin-top: 17px; }
-    .home-location-label { display: flex; align-items: center; gap: 6px; color: #858d84; font-size: 10px; }
-    .home-location-label svg { width: 13px; height: 13px; color: var(--green); }
-    .home-location-row .location-button { padding: 6px 8px; font-size: 10px; }
+    .home-location-panel { margin-top: 19px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .home-location-title { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; color: #596259; font-size: 10px; font-weight: 680; }
+    .home-location-title svg { width: 14px; height: 14px; color: var(--green); }
+    .location-entry { display: flex; gap: 7px; }
+    .location-input { min-width: 0; flex: 1; padding: 9px 10px; border: 1px solid #e5e9e2; border-radius: 7px; outline: none; color: #333b34; background: #fff; font: inherit; font-size: 11px; }
+    .location-input:focus { border-color: #8ab799; box-shadow: 0 0 0 3px #377b5012; }
+    .save-location-button, .use-location-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--green-dark); border-radius: 7px; color: #fff; background: var(--green-dark); font-size: 10px; font-weight: 650; white-space: nowrap; }
+    .save-location-button:hover, .use-location-button:hover { border-color: #1d5030; background: #1d5030; }
+    .use-location-button { width: 100%; margin-top: 7px; border-color: #d7e5d8; color: var(--green-dark); background: #f2f8f2; }
+    .use-location-button:hover { border-color: #a9c9ae; color: #fff; }
+    .use-location-button svg { width: 13px; height: 13px; }
+    .use-location-button:disabled { cursor: wait; opacity: .7; }
+    .home-location-status { min-height: 0; margin-top: 7px; color: var(--green-dark); font-size: 10px; line-height: 1.45; }
+    .home-location-status:empty { display: none; }
+    .home-location-current { margin-top: 7px; color: #929990; font-size: 9px; }
+    .home-location-current strong { color: #687168; font-weight: 650; }
+    .location-demo-note { margin-top: 6px; color: #929990; font-size: 9px; line-height: 1.45; }
     .home-stores { display: flex; align-items: center; gap: 8px; margin-top: 17px; padding-top: 14px; border-top: 1px solid var(--line); }
     .home-stores-label { flex: 0 0 auto; color: #929990; font-size: 9px; }
     .home-stores .store-chips { gap: 5px; }
@@ -270,7 +285,8 @@
       .home-header-right { gap: 12px; }
       .home-nav-link { display: none; }
       .home-main { width: calc(100% - 36px); padding-top: 37px; }
-      .home-hero { grid-template-columns: 1fr; gap: 27px; max-width: 520px; margin: 0 auto; }
+      .home-hero { grid-template-columns: minmax(0, 1fr); gap: 27px; max-width: 520px; margin: 0 auto; }
+      .home-hero > *, .home-list-card { min-width: 0; }
       .home-copy { padding-bottom: 0; }
       .home-copy h1 { max-width: 450px; font-size: clamp(38px, 9vw, 52px); }
       .home-copy > p { font-size: 13px; }
@@ -298,7 +314,8 @@
       .home-header { width: calc(100% - 28px); }
       .home-header .brand { font-size: 17px; }
       .home-header-right { gap: 6px; }
-      .home-header .location-button { max-width: 150px; }
+      .home-header .language-select { width: 76px; padding-right: 18px; padding-left: 6px; font-size: 9px; }
+      .home-header .location-button { max-width: 132px; padding-right: 7px; padding-left: 7px; }
       .home-main { width: calc(100% - 28px); padding-top: 30px; }
       .home-copy h1 { font-size: 39px; }
       .home-features { grid-template-columns: 1fr; gap: 8px; }
@@ -316,6 +333,11 @@
       .savings-note { margin-right: 12px; margin-left: 12px; }
       .item-prices { padding-right: 12px; padding-left: 12px; }
     }
+    @media (max-width: 380px) {
+      .home-header { height: auto; min-height: 64px; flex-wrap: wrap; row-gap: 7px; padding: 8px 0; }
+      .home-header-right { width: 100%; justify-content: flex-end; }
+      .home-header .brand { margin-right: auto; }
+    }
   </style>
 </head>
 <body>
@@ -329,7 +351,10 @@
       </a>
       <div class="home-header-right">
         <a class="home-nav-link" href="#how-it-works" data-i18n="howItWorks">How it works</a>
-        <button class="language-button" type="button" data-language-toggle aria-label="Switch language">DE</button>
+        <select class="language-select" data-language-select aria-label="Select language">
+          <option value="en">🇬🇧 EN</option>
+          <option value="de">🇩🇪 DE</option>
+        </select>
         <button class="location-button" id="homeLocationButton" type="button" aria-label="Change shopping location" data-i18n-aria="changeLocation">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
           <span id="homeLocationText">Bielefeld, Deutschland</span>
@@ -351,6 +376,23 @@
         </div>
 
         <section class="card list-card home-list-card" aria-labelledby="homeListTitle">
+          <section class="home-location-panel" aria-labelledby="locationFieldLabel">
+            <label class="home-location-title" id="locationFieldLabel" for="homeLocationInput">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span data-i18n="locationFieldLabel">Your shopping location</span>
+            </label>
+            <form class="location-entry" id="locationForm">
+              <input class="location-input" id="homeLocationInput" type="text" data-i18n-placeholder="locationPlaceholder" aria-describedby="locationDemoNote">
+              <button class="save-location-button" type="submit" data-i18n="saveLocation">Save location</button>
+            </form>
+            <button class="use-location-button" id="useCurrentLocation" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+              <span data-i18n="useCurrentLocation">Use my current location</span>
+            </button>
+            <div class="home-location-status" id="homeLocationStatus" role="status" aria-live="polite"></div>
+            <div class="home-location-current"><span data-i18n="comparingAround">Comparing around</span> <strong id="homeLocationInline">Bielefeld, Germany</strong></div>
+            <div class="location-demo-note" id="locationDemoNote" data-i18n="locationDemoNote">Your browser will ask permission to share your location. Store matches and prices are sample data.</div>
+          </section>
           <div class="card-heading">
             <div>
               <h2 id="homeListTitle" data-i18n="startList">Start with your shopping list</h2>
@@ -369,13 +411,6 @@
             <span data-i18n="findPrices">Find my best prices</span>
           </button>
           <div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div>
-          <div class="home-location-row">
-            <span class="home-location-label">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
-              <span data-i18n="comparingAround">Comparing around</span>
-            </span>
-            <span class="home-location-label"><strong id="homeLocationInline">Bielefeld, Germany</strong></span>
-          </div>
           <div class="home-stores">
             <span class="home-stores-label" data-i18n="stores">Stores</span>
             <div class="store-chips" aria-label="Stores included in comparison" data-i18n-aria="storesIncluded">
@@ -452,7 +487,10 @@
       <header class="topbar">
         <div class="breadcrumb"><a href="#home" data-view="home">SmartBuy.ai</a> <span aria-hidden="true">/</span> <strong id="breadcrumbCurrent" data-i18n="priceComparison">Price comparison</strong></div>
         <div class="topbar-right">
-          <button class="language-button" type="button" data-language-toggle aria-label="Switch language">DE</button>
+          <select class="language-select" data-language-select aria-label="Select language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="de">🇩🇪 DE</option>
+          </select>
           <button class="location-button" id="locationButton" type="button" aria-label="Change shopping location" data-i18n-aria="changeLocation">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
             <span id="locationText">Bielefeld, Deutschland</span>
@@ -630,7 +668,7 @@
     const translations = {
       en: {
         howItWorks: "How it works", personalAssistant: "Your personal shopping assistant", heroLine1: "Good groceries.", heroLine2: "Better prices.",
-        shoppingListLabel: "Shopping list items", notifications: "Notifications",
+        shoppingListLabel: "Shopping list items", notifications: "Notifications", selectLanguage: "Select language",
         heroDescription: "Your list, compared. SmartBuy checks nearby supermarket prices and helps you find the best total for your weekly shop.",
         lessChecking: "Less price-checking, more saving.", startList: "Start with your shopping list", whatNeed: "What do you need this week?",
         onePerLine: "One item per line — quantities welcome", findPrices: "Find my best prices", comparingAround: "Comparing around",
@@ -657,6 +695,16 @@
         samplePriceClickdummy: "Sample price for this clickdummy", yourShoppingList: "Your shopping list",
         selectedBasket: "Selected shopping basket", demoTravelNote: "Store address and prices are illustrative demo data. Check the destination in Maps before travelling.",
         changeLocation: "Change shopping location", locationPrompt: "Enter your city or postal code:", addItemError: "Add at least one item to your list to compare prices.",
+        locationFieldLabel: "Your shopping location", locationPlaceholder: "City, postal code, or address",
+        saveLocation: "Save location", useCurrentLocation: "Use my current location", locationDemoNote: "Your browser will ask permission to share your location. Store matches and prices are sample data.",
+        locationRequired: "Enter a city, postal code, or address first.", locationSaved: "Shopping location set to {location}.",
+        locating: "Finding your location…", currentLocationSet: "Current location set to {coordinates}.",
+        geolocationUnavailable: "Location is not available in this browser.", locationPermissionDenied: "Location permission was denied. You can enter a location manually instead.",
+        locationPositionUnavailable: "Your location could not be determined. Try entering it manually.",
+        locationTimeout: "Location request timed out. Please try again or enter it manually.",
+        locationUnknownError: "Something went wrong while getting your location. Please try again.",
+        locationNeedsSecureContext: "Location access requires a secure page (HTTPS) or localhost.",
+        gpsPrefix: "GPS", gpsDirectionsOrigin: "Your current GPS coordinates",
         scanning: "Scanning nearby stores…", scanningComplete: "Done! Compared {count} {items} at 4 nearby stores.",
         item: "item", items: "items", resultsHeadingBasket: "Best match for your basket", resultsHeadingItem: "Best match for your item",
         resultsFoundOne: "We found 4 stores with your item nearby.", resultsFoundMany: "We found 4 stores with your items nearby.",
@@ -673,7 +721,7 @@
         addGroceries: "Füge benötigte Artikel und Mengen hinzu.", compareNearby: "Preise in deiner Nähe",
         basketTotals: "Vergleiche Warenkorbpreise lokaler Supermärkte.", chooseBestBasket: "Günstigsten Markt finden",
         findStoreBudget: "Finde den passenden Markt für deine Liste und dein Budget.", smarterGroceryRun: "Cleverer einkaufen",
-        shoppingListLabel: "Artikel auf der Einkaufsliste", notifications: "Benachrichtigungen",
+        shoppingListLabel: "Artikel auf der Einkaufsliste", notifications: "Benachrichtigungen", selectLanguage: "Sprache auswählen",
         workspace: "Arbeitsbereich", mainNavigation: "Hauptnavigation", dashboard: "Übersicht", myShoppingList: "Meine Einkaufsliste",
         priceComparisons: "Preisvergleiche", nearbyStores: "Märkte in der Nähe", smarterEveryShop: "Bei jedem Einkauf cleverer",
         compareFullBasket: "Wir vergleichen deinen gesamten Warenkorb, damit du weniger Zeit mit der Preissuche verbringst.", freePlan: "Kostenloser Tarif",
@@ -697,6 +745,18 @@
         yourShoppingList: "Deine Einkaufsliste", selectedBasket: "Ausgewählter Warenkorb",
         demoTravelNote: "Marktadresse und Preise sind Beispieldaten. Bitte prüfe das Ziel in Maps, bevor du losfährst.",
         changeLocation: "Standort ändern", locationPrompt: "Stadt oder Postleitzahl eingeben:",
+        locationFieldLabel: "Dein Einkaufsstandort", locationPlaceholder: "Stadt, Postleitzahl oder Adresse",
+        saveLocation: "Standort speichern", useCurrentLocation: "Meinen aktuellen Standort verwenden",
+        locationDemoNote: "Dein Browser fragt nach der Standortfreigabe. Marktangebote und Preise sind Beispieldaten.",
+        locationRequired: "Gib zuerst eine Stadt, Postleitzahl oder Adresse ein.", locationSaved: "Einkaufsstandort auf {location} gesetzt.",
+        locating: "Standort wird ermittelt …", currentLocationSet: "Aktueller Standort: {coordinates}.",
+        geolocationUnavailable: "Die Standortbestimmung ist in diesem Browser nicht verfügbar.",
+        locationPermissionDenied: "Standortzugriff wurde abgelehnt. Du kannst den Standort stattdessen manuell eingeben.",
+        locationPositionUnavailable: "Dein Standort konnte nicht ermittelt werden. Gib ihn stattdessen manuell ein.",
+        locationTimeout: "Die Standortbestimmung hat zu lange gedauert. Bitte erneut versuchen oder manuell eingeben.",
+        locationUnknownError: "Beim Abrufen deines Standorts ist ein Fehler aufgetreten. Bitte erneut versuchen.",
+        locationNeedsSecureContext: "Der Standortzugriff erfordert eine sichere Seite (HTTPS) oder localhost.",
+        gpsPrefix: "GPS", gpsDirectionsOrigin: "Deine aktuellen GPS-Koordinaten",
         addItemError: "Füge mindestens einen Artikel hinzu, um Preise zu vergleichen.", scanning: "Märkte in der Nähe werden verglichen …",
         scanningComplete: "Fertig! {count} {items} bei 4 Märkten in der Nähe verglichen.",
         item: "Artikel", items: "Artikel", resultsHeadingBasket: "Bester Treffer für deinen Warenkorb",
@@ -748,13 +808,20 @@
       document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
         element.setAttribute("aria-label", text(element.dataset.i18nAria));
       });
-      document.querySelectorAll("[data-language-toggle]").forEach((button) => {
-        button.textContent = activeLanguage === "en" ? "DE" : "EN";
-        button.setAttribute("aria-label", activeLanguage === "en" ? "Switch to German" : "Auf Englisch wechseln");
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+        element.setAttribute("placeholder", text(element.dataset.i18nPlaceholder));
+      });
+      document.querySelectorAll("[data-language-select]").forEach((select) => {
+        select.value = activeLanguage;
+        select.setAttribute("aria-label", text("selectLanguage"));
       });
       document.title = activeLanguage === "de" ? "SmartBuy.ai — Clever einkaufen" : "SmartBuy.ai — A smarter way to shop";
       const currentLocation = localStorage.getItem("smartbuy-location") || "Bielefeld";
-      const displayLocation = activeLanguage === "de" ? `${currentLocation}, Deutschland` : `${currentLocation}, Germany`;
+      const coordinates = localStorage.getItem("smartbuy-coordinates");
+      const displayLocation = coordinates
+        ? `${text("gpsPrefix")}: ${currentLocation}`
+        : `${currentLocation}, ${activeLanguage === "de" ? "Deutschland" : "Germany"}`;
+      document.querySelector("#homeLocationInput").value = currentLocation;
       homeLocationText.textContent = displayLocation;
       locationText.textContent = displayLocation;
       homeLocationInline.textContent = displayLocation;
@@ -918,16 +985,77 @@
       }
     });
 
-    function changeLocation() {
-      const nextLocation = window.prompt(text("locationPrompt"), localStorage.getItem("smartbuy-location") || "Bielefeld");
-      if (nextLocation && nextLocation.trim()) {
-        const location = nextLocation.trim();
-        localStorage.setItem("smartbuy-location", location);
-        applyLanguage();
-        resultsMessage = { type: "location", location };
-        renderResultsDescription();
+    function saveLocation(location, coordinates = null) {
+      const value = location.trim();
+      if (!value) {
+        document.querySelector("#homeLocationStatus").textContent = text("locationRequired");
+        document.querySelector("#homeLocationInput").focus();
+        return false;
       }
+
+      localStorage.setItem("smartbuy-location", value);
+      if (coordinates) {
+        localStorage.setItem("smartbuy-coordinates", JSON.stringify(coordinates));
+      } else {
+        localStorage.removeItem("smartbuy-coordinates");
+      }
+
+      resultsMessage = { type: "location", location: value };
+      applyLanguage();
+      const locationDisplay = localStorage.getItem("smartbuy-coordinates")
+        ? `${text("gpsPrefix")}: ${value}`
+        : `${value}, ${activeLanguage === "de" ? "Deutschland" : "Germany"}`;
+      document.querySelector("#homeLocationStatus").textContent = coordinates
+        ? text("currentLocationSet", { coordinates: value })
+        : text("locationSaved", { location: locationDisplay });
+      renderResultsDescription();
+      return true;
     }
+
+    function changeLocation() {
+      const nextLocation = window.prompt(text("locationPrompt"), document.querySelector("#homeLocationInput").value);
+      if (nextLocation !== null) saveLocation(nextLocation);
+    }
+
+    document.querySelector("#locationForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveLocation(document.querySelector("#homeLocationInput").value);
+    });
+
+    document.querySelector("#useCurrentLocation").addEventListener("click", () => {
+      const button = document.querySelector("#useCurrentLocation");
+      const status = document.querySelector("#homeLocationStatus");
+      if (!window.isSecureContext) {
+        status.textContent = text("locationNeedsSecureContext");
+        return;
+      }
+      if (!navigator.geolocation) {
+        status.textContent = text("geolocationUnavailable");
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = text("locating");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          button.disabled = false;
+          const { latitude, longitude, accuracy } = position.coords;
+          const coordinates = { latitude, longitude, accuracy };
+          const coordinateLabel = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+          saveLocation(coordinateLabel, coordinates);
+        },
+        (error) => {
+          button.disabled = false;
+          const messages = {
+            1: "locationPermissionDenied",
+            2: "locationPositionUnavailable",
+            3: "locationTimeout"
+          };
+          status.textContent = text(messages[error.code] || "locationUnknownError");
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      );
+    });
 
     document.querySelector("#locationButton").addEventListener("click", changeLocation);
     document.querySelector("#homeLocationButton").addEventListener("click", changeLocation);
@@ -937,13 +1065,14 @@
       renderResultsDescription();
     });
 
-    document.querySelectorAll("[data-language-toggle]").forEach((button) => {
-      button.addEventListener("click", () => {
+    document.querySelectorAll("[data-language-select]").forEach((select) => {
+      select.addEventListener("change", () => {
         const oldSample = shoppingList.value === sampleLists[activeLanguage];
-        activeLanguage = activeLanguage === "en" ? "de" : "en";
+        activeLanguage = select.value;
         localStorage.setItem("smartbuy-language", activeLanguage);
         if (oldSample) shoppingList.value = sampleLists[activeLanguage];
         scanStatus.textContent = "";
+        document.querySelector("#homeLocationStatus").textContent = "";
         applyLanguage();
       });
     });
