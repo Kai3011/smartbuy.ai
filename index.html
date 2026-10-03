@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f7f4">
+  <title>SmartBuy.ai — A smarter way to shop</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202620;
+      --muted: #788078;
+      --line: #e8ebe5;
+      --canvas: #f6f7f4;
+      --surface: #fff;
+      --green: #377b50;
+      --green-dark: #28633e;
+      --green-pale: #eaf4ec;
+      --lime: #d9ef8a;
+      --orange: #e98e55;
+      --shadow: 0 12px 35px rgba(31, 52, 34, .055);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--canvas); color: var(--ink); }
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; display: none; grid-template-columns: 248px minmax(0, 1fr); }
+    .home-screen { min-height: 100vh; }
+    body.results-view .app { display: grid; }
+    body.results-view .home-screen { display: none; }
+    body:not(.results-view) .app { display: none; }
+    body.store-view #dashboard > .welcome,
+    body.store-view #dashboard > .content-grid { display: none; }
+    body.store-view .store-summary-page { display: block; }
+    .store-summary-page { display: none; max-width: 920px; margin: 0 auto; }
+    .home-header {
+      width: min(1180px, calc(100% - 64px)); height: 76px; display: flex; align-items: center;
+      justify-content: space-between; margin: 0 auto; border-bottom: 1px solid var(--line);
+    }
+    .home-header .brand { padding: 0; }
+    .home-header-right { display: flex; align-items: center; gap: 19px; }
+    .language-select { min-height: 33px; padding: 6px 26px 6px 9px; border: 1px solid var(--line); border-radius: 7px; color: #515b51; background: #fff; font: inherit; font-size: 10px; font-weight: 650; cursor: pointer; }
+    .language-select:hover, .language-select:focus-visible { border-color: #b8cdbb; outline-color: var(--green); }
+    .home-nav-link { color: #687168; font-size: 12px; font-weight: 570; text-decoration: none; }
+    .home-nav-link:hover { color: var(--green); }
+    .home-main { width: min(1080px, calc(100% - 64px)); margin: 0 auto; padding: 48px 0 35px; }
+    .home-hero { display: grid; grid-template-columns: minmax(0, 1.03fr) minmax(360px, .83fr); align-items: center; gap: 65px; }
+    .home-copy { padding: 5px 0 14px; }
+    .home-copy .eyebrow { margin-bottom: 16px; }
+    .home-copy h1 { max-width: 540px; font-size: clamp(40px, 5vw, 58px); line-height: 1.07; letter-spacing: -2.8px; }
+    .home-copy h1 em { color: var(--green); font-style: normal; }
+    .home-copy > p { max-width: 420px; margin: 17px 0 0; color: #727b72; font-size: 15px; line-height: 1.75; }
+    .home-proof { display: flex; align-items: center; gap: 10px; margin-top: 25px; color: #7b837b; font-size: 11px; }
+    .proof-avatars { display: flex; padding-left: 3px; }
+    .proof-avatars span { width: 25px; height: 25px; display: grid; place-items: center; margin-left: -3px; border: 2px solid var(--canvas); border-radius: 50%; color: #fff; background: #91a980; font-size: 8px; font-weight: 700; }
+    .proof-avatars span:nth-child(2) { background: #d2956e; }
+    .proof-avatars span:nth-child(3) { background: #8a9fb4; }
+    .home-list-card { padding: 23px; border-color: #e3e9df; box-shadow: 0 18px 48px rgba(31, 52, 34, .085); }
+    .home-list-card .home-location-panel { margin-top: 0; padding-top: 0; padding-bottom: 16px; border-top: 0; border-bottom: 1px solid var(--line); }
+    .home-list-card .location-demo-note { line-height: 1.4; }
+    .home-list-card .card-heading h2 { font-size: 16px; }
+    .home-list-card textarea { min-height: 143px; background: #fff; }
+    .home-list-card .scan-button { margin-top: 15px; padding: 14px; font-size: 13px; }
+    .home-list-card .scan-status { min-height: 0; }
+    .home-list-card .editor-hint { margin-top: 8px; }
+    .home-location-panel { margin-top: 19px; padding-top: 16px; border-top: 1px solid var(--line); }
+    .home-location-title { display: flex; align-items: center; gap: 7px; margin-bottom: 9px; color: #596259; font-size: 10px; font-weight: 680; }
+    .home-location-title svg { width: 14px; height: 14px; color: var(--green); }
+    .location-entry { display: flex; gap: 7px; }
+    .location-input { min-width: 0; flex: 1; padding: 9px 10px; border: 1px solid #e5e9e2; border-radius: 7px; outline: none; color: #333b34; background: #fff; font: inherit; font-size: 11px; }
+    .location-input:focus { border-color: #8ab799; box-shadow: 0 0 0 3px #377b5012; }
+    .save-location-button, .use-location-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--green-dark); border-radius: 7px; color: #fff; background: var(--green-dark); font-size: 10px; font-weight: 650; white-space: nowrap; }
+    .save-location-button:hover, .use-location-button:hover { border-color: #1d5030; background: #1d5030; }
+    .use-location-button { width: 100%; margin-top: 7px; border-color: #d7e5d8; color: var(--green-dark); background: #f2f8f2; }
+    .use-location-button:hover { border-color: #a9c9ae; color: #fff; }
+    .use-location-button svg { width: 13px; height: 13px; }
+    .use-location-button:disabled { cursor: wait; opacity: .7; }
+    .home-location-status { min-height: 0; margin-top: 7px; color: var(--green-dark); font-size: 10px; line-height: 1.45; }
+    .home-location-status:empty { display: none; }
+    .home-location-current { margin-top: 7px; color: #929990; font-size: 9px; }
+    .home-location-current strong { color: #687168; font-weight: 650; }
+    .location-demo-note { margin-top: 6px; color: #929990; font-size: 9px; line-height: 1.45; }
+    .home-stores { display: flex; align-items: center; gap: 8px; margin-top: 17px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .home-stores-label { flex: 0 0 auto; color: #929990; font-size: 9px; }
+    .home-stores .store-chips { gap: 5px; }
+    .home-stores .store-chip { padding: 5px 7px; font-size: 9px; }
+    .home-features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 47px; }
+    .home-feature { display: flex; align-items: flex-start; gap: 11px; padding: 15px 14px; border: 1px solid #e9ece6; border-radius: 10px; background: rgba(255,255,255,.65); }
+    .feature-icon { display: grid; place-items: center; flex: 0 0 auto; width: 30px; height: 30px; border-radius: 9px; color: var(--green); background: var(--green-pale); }
+    .feature-icon svg { width: 15px; height: 15px; stroke: currentColor; }
+    .home-feature strong { display: block; margin-top: 1px; font-size: 11px; font-weight: 680; }
+    .home-feature p { margin: 4px 0 0; color: #848c84; font-size: 10px; line-height: 1.5; }
+    .home-footer { margin-top: 36px; color: #9aa098; text-align: center; font-size: 10px; }
+    .home-footer strong { color: #687168; font-weight: 600; }
+
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; padding: 27px 18px 20px;
+      display: flex; flex-direction: column; background: #fff; border-right: 1px solid var(--line);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 0 10px; font-size: 19px; font-weight: 750; letter-spacing: -.7px; }
+    .brand-mark {
+      display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px;
+      color: #fff; background: var(--green); box-shadow: 0 4px 10px #377b5033;
+    }
+    .brand-mark svg { width: 20px; height: 20px; }
+    .brand .ai { color: var(--green); }
+    .nav-label { margin: 39px 11px 12px; color: #9ba19a; font-size: 10px; font-weight: 750; letter-spacing: 1.1px; text-transform: uppercase; }
+    .nav { display: grid; gap: 5px; }
+    .nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 9px; color: #697169; font-size: 13px; font-weight: 570; text-decoration: none; }
+    .nav-link svg { width: 17px; height: 17px; stroke: currentColor; }
+    .nav-link.active { color: var(--green-dark); background: var(--green-pale); font-weight: 680; }
+    .nav-link:hover:not(.active) { background: #f7f8f6; }
+    .sidebar-bottom { margin-top: auto; }
+    .tip-card { padding: 15px; border: 1px solid #e8ede5; border-radius: 12px; background: #fafbf8; }
+    .tip-card .tip-title { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 700; }
+    .tip-card .tip-title span { color: #db9d42; font-size: 15px; }
+    .tip-card p { margin: 8px 0 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .profile { display: flex; align-items: center; gap: 10px; margin: 22px 5px 0; padding-top: 17px; border-top: 1px solid var(--line); }
+    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: #5b583f; background: #f1e9d9; font-size: 11px; font-weight: 700; }
+    .profile-name { font-size: 12px; font-weight: 670; }
+    .profile-plan { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .profile-more { margin-left: auto; color: #929990; font-size: 20px; }
+
+    main { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 48px 54px; }
+    .topbar { min-height: 76px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+    .breadcrumb { color: #848b83; font-size: 12px; }
+    .breadcrumb strong { color: #424a42; font-weight: 620; }
+    .topbar-right { display: flex; align-items: center; gap: 18px; }
+    .location-button {
+      display: inline-flex; align-items: center; gap: 7px; padding: 8px 11px; border: 1px solid var(--line);
+      border-radius: 8px; color: #515b51; background: #fff; font-size: 11px; font-weight: 570;
+    }
+    .location-button svg { width: 14px; height: 14px; color: var(--green); }
+    .notification { position: relative; display: grid; place-items: center; width: 32px; height: 32px; border: 0; background: transparent; color: #767e76; }
+    .notification svg { width: 18px; height: 18px; }
+    .notification::after { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border: 1.5px solid var(--canvas); border-radius: 50%; background: var(--orange); content: ""; }
+
+    .welcome { display: flex; align-items: flex-end; justify-content: space-between; margin: 36px 0 25px; }
+    .eyebrow { display: flex; align-items: center; gap: 7px; margin-bottom: 10px; color: var(--green); font-size: 10px; font-weight: 750; letter-spacing: 1.15px; text-transform: uppercase; }
+    .eyebrow .spark { font-size: 14px; }
+    h1 { margin: 0; font-size: clamp(26px, 3vw, 34px); font-weight: 680; letter-spacing: -1.5px; }
+    .welcome p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .updated { padding-bottom: 3px; color: #929990; font-size: 10px; }
+
+    .content-grid { display: grid; grid-template-columns: minmax(275px, .82fr) minmax(460px, 1.5fr); align-items: start; gap: 21px; }
+    .card { border: 1px solid var(--line); border-radius: 13px; background: var(--surface); box-shadow: var(--shadow); }
+    .list-card { padding: 21px; }
+    .card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .card-heading h2 { margin: 0; font-size: 15px; font-weight: 680; letter-spacing: -.25px; }
+    .card-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .count { padding: 5px 8px; border-radius: 20px; color: var(--green); background: var(--green-pale); font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .items-editor { position: relative; margin-top: 19px; }
+    textarea {
+      display: block; width: 100%; min-height: 157px; padding: 13px 14px; resize: vertical;
+      border: 1px solid #e5e9e2; border-radius: 9px; outline: none; color: #333b34; background: #fcfdfa;
+      font-size: 12px; line-height: 2; transition: border-color .18s, box-shadow .18s;
+    }
+    textarea:focus { border-color: #8ab799; box-shadow: 0 0 0 3px #377b5012; }
+    .editor-hint { margin: 8px 1px 0; color: #969d95; font-size: 10px; }
+    .basket-summary { display: grid; gap: 0; margin: 16px 0 0; padding: 0; list-style: none; }
+    .basket-summary li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 1px; border-bottom: 1px solid #f0f1ee; color: #596259; font-size: 11px; }
+    .basket-summary li:last-child { border-bottom: 0; }
+    .basket-summary .basket-quantity { color: #8a9289; }
+    .edit-list-inline { margin-top: 9px; padding: 0; border: 0; color: var(--green); background: transparent; font-size: 10px; font-weight: 650; }
+    .edit-list-inline:hover { color: var(--green-dark); text-decoration: underline; }
+    .scan-button {
+      width: 100%; display: flex; justify-content: center; align-items: center; gap: 9px; margin-top: 18px; padding: 12px 15px;
+      border: 0; border-radius: 8px; color: #fff; background: var(--green); font-size: 12px; font-weight: 670;
+      box-shadow: 0 5px 12px #377b5029; transition: background .18s, transform .18s;
+    }
+    .scan-button:hover { background: var(--green-dark); transform: translateY(-1px); }
+    .scan-button:disabled { cursor: wait; opacity: .78; transform: none; }
+    .scan-button svg { width: 16px; height: 16px; }
+    .scan-meta { display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 11px; color: #9aa098; font-size: 10px; }
+    .scan-meta svg { width: 12px; height: 12px; }
+    .divider { height: 1px; margin: 19px 0 16px; background: var(--line); }
+    .nearby-title { display: flex; align-items: center; gap: 7px; margin-bottom: 11px; color: #6f786f; font-size: 10px; font-weight: 700; }
+    .nearby-title svg { width: 13px; height: 13px; color: var(--green); }
+    .store-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+    .store-chip { padding: 6px 9px; border: 1px solid #e8ebe6; border-radius: 6px; color: #697168; background: #fff; font-size: 10px; }
+    .store-chip.selected { border-color: #bed7c3; color: var(--green-dark); background: #f2f8f2; }
+
+    .results-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin: 1px 1px 13px; }
+    .results-head h2 { margin: 0; font-size: 15px; font-weight: 680; letter-spacing: -.25px; }
+    .results-head p { margin: 5px 0 0; color: var(--muted); font-size: 11px; }
+    .sort-button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; color: #646d64; background: #fff; font-size: 10px; }
+    .sort-button svg { width: 13px; height: 13px; }
+    .recommended {
+      overflow: hidden; border: 1px solid #cfe1d1; border-radius: 13px; background: #fff;
+      box-shadow: 0 10px 30px rgba(42, 96, 56, .08);
+    }
+    .recommend-banner { display: flex; align-items: center; justify-content: space-between; min-height: 32px; padding: 7px 15px; color: #2e7145; background: #eef7ed; font-size: 10px; font-weight: 700; }
+    .recommend-banner span { display: inline-flex; align-items: center; gap: 6px; }
+    .recommend-banner svg { width: 13px; height: 13px; }
+    .recommend-banner .match { color: #6c866f; font-size: 9px; font-weight: 570; }
+    .store-main { display: flex; align-items: center; gap: 12px; padding: 15px 16px 12px; }
+    .store-logo { display: grid; place-items: center; flex: 0 0 auto; width: 42px; height: 42px; border-radius: 11px; font-size: 12px; font-weight: 850; letter-spacing: -.5px; }
+    .logo-aldi { color: #fff; background: #07529a; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px #e8504e; }
+    .logo-lidl { color: #d8272f; background: #ffdc38; border: 3px solid #13509b; font-size: 11px; }
+    .logo-rewe { color: #fff; background: #d52632; }
+    .store-info { min-width: 0; flex: 1; }
+    .store-name-line { display: flex; align-items: center; gap: 7px; }
+    .store-name { font-size: 13px; font-weight: 720; }
+    .best-tag { padding: 3px 6px; border-radius: 4px; color: #2c7042; background: #eaf4ea; font-size: 8px; font-weight: 720; }
+    .store-details { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 5px; color: #818981; font-size: 10px; }
+    .store-details .dot { color: #ccd0ca; }
+    .price-block { text-align: right; white-space: nowrap; }
+    .price { font-size: 23px; font-weight: 730; letter-spacing: -1px; }
+    .price-label { margin-top: 1px; color: #929990; font-size: 9px; }
+    .savings-note { margin: 0 16px 13px; padding: 9px 10px; border-radius: 7px; color: #4d7553; background: #f4f8f1; font-size: 10px; line-height: 1.45; }
+    .savings-note strong { color: #31633d; }
+    .item-prices { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 14px; }
+    .item-price { display: flex; align-items: center; gap: 5px; padding: 5px 7px; border: 1px solid #edf0eb; border-radius: 6px; color: #727a72; font-size: 9px; }
+    .item-price strong { color: #3e483f; font-weight: 650; }
+    .choose-store-row { display: flex; justify-content: flex-end; padding: 0 16px 14px; }
+    .choose-store-button { padding: 8px 11px; border: 1px solid var(--green-dark); border-radius: 7px; color: #fff; background: var(--green-dark); font-size: 10px; font-weight: 650; box-shadow: 0 3px 8px #28633e24; transition: background .18s, transform .18s; }
+    .choose-store-button:hover { border-color: #1d5030; background: #1d5030; transform: translateY(-1px); }
+    .store-card > .choose-store-button { width: 100%; margin-top: 10px; }
+
+    .other-heading { display: flex; align-items: center; justify-content: space-between; margin: 19px 1px 9px; }
+    .other-heading h3 { margin: 0; font-size: 11px; font-weight: 680; }
+    .other-heading span { color: #929990; font-size: 9px; }
+    .other-stores { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .store-card { padding: 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff; box-shadow: 0 5px 18px rgba(31, 52, 34, .03); }
+    .store-card-top { display: flex; align-items: center; gap: 9px; }
+    .store-card .store-logo { width: 34px; height: 34px; border-radius: 9px; font-size: 10px; }
+    .store-card .store-name { font-size: 11px; }
+    .store-card .store-details { font-size: 9px; margin-top: 4px; }
+    .store-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 11px; padding-top: 9px; border-top: 1px solid #f0f1ee; }
+    .store-card .price { font-size: 18px; }
+    .diff { color: #a47a62; font-size: 9px; }
+    .details-button { display: inline-flex; align-items: center; gap: 4px; padding: 5px 0 5px 5px; border: 0; color: var(--green); background: transparent; font-size: 9px; font-weight: 650; }
+    .details-button svg { width: 12px; height: 12px; transition: transform .2s; }
+    .store-card.expanded .details-button svg { transform: rotate(180deg); }
+    .store-breakdown { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f1ee; color: #788078; font-size: 9px; line-height: 1.7; }
+    .store-card.expanded .store-breakdown { display: block; }
+    .scan-status { min-height: 15px; margin-top: 8px; color: var(--green); text-align: center; font-size: 10px; }
+    .scan-status:empty { display: none; }
+    .footer-note { margin-top: 18px; color: #9aa098; text-align: center; font-size: 9px; line-height: 1.5; }
+    .edit-list-button { flex: 0 0 auto; color: var(--green); }
+    .breadcrumb a { color: inherit; text-decoration: none; }
+    .breadcrumb a:hover { color: var(--green); }
+    .store-summary-back { margin: 27px 0 18px; padding: 0; border: 0; color: #6f786f; background: transparent; font-size: 11px; font-weight: 600; }
+    .store-summary-back:hover { color: var(--green); }
+    .store-summary-heading { margin-bottom: 20px; }
+    .store-summary-heading h1 { font-size: clamp(25px, 3vw, 32px); }
+    .store-summary-heading p { margin: 7px 0 0; color: var(--muted); font-size: 12px; }
+    .store-summary-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(280px, .8fr); align-items: start; gap: 16px; }
+    .selected-store-card, .selected-basket-card { padding: 20px; }
+    .selected-store-identity { display: flex; align-items: center; gap: 13px; }
+    .selected-store-identity .store-logo { width: 48px; height: 48px; }
+    .selected-store-name { margin: 0; font-size: 17px; font-weight: 720; }
+    .selected-store-subtitle { margin-top: 4px; color: var(--muted); font-size: 10px; }
+    .address-block { display: flex; align-items: flex-start; gap: 10px; margin-top: 19px; padding: 14px; border: 1px solid #edf0eb; border-radius: 9px; background: #fcfdfa; }
+    .address-icon { display: grid; place-items: center; flex: 0 0 auto; width: 29px; height: 29px; border-radius: 8px; color: var(--green); background: var(--green-pale); }
+    .address-icon svg { width: 15px; height: 15px; stroke: currentColor; }
+    .address-label { margin: 1px 0 5px; color: #8b938a; font-size: 9px; font-weight: 650; letter-spacing: .5px; text-transform: uppercase; }
+    .address-text { color: #394239; font-size: 12px; font-weight: 600; line-height: 1.55; }
+    .address-note { margin-top: 5px; color: #929990; font-size: 9px; }
+    .directions-button { width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 12px; padding: 12px 15px; border: 0; border-radius: 8px; color: #fff; background: var(--green); font-size: 11px; font-weight: 670; text-decoration: none; box-shadow: 0 5px 12px #377b5029; transition: background .18s, transform .18s; }
+    .directions-button:hover { transform: translateY(-1px); background: var(--green-dark); }
+    .directions-button svg { width: 15px; height: 15px; stroke: currentColor; }
+    .store-summary-price { margin-top: 17px; padding-top: 14px; border-top: 1px solid var(--line); }
+    .store-summary-price .price { font-size: 25px; }
+    .store-summary-price p { margin: 3px 0 0; color: #879087; font-size: 10px; }
+    .selected-basket-card h2 { margin: 0; font-size: 14px; font-weight: 680; }
+    .selected-basket-card > p { margin: 5px 0 0; color: var(--muted); font-size: 10px; }
+    .selected-basket-card .basket-summary { margin-top: 11px; }
+    .summary-demo-note { margin-top: 15px; padding: 10px 11px; border-radius: 7px; color: #727b72; background: #f6f7f4; font-size: 9px; line-height: 1.55; }
+
+    @media (max-width: 1000px) {
+      .app { grid-template-columns: 205px minmax(0, 1fr); }
+      main { padding-right: 28px; padding-left: 28px; }
+      .content-grid { grid-template-columns: minmax(255px, .85fr) minmax(370px, 1.3fr); gap: 15px; }
+      .list-card { padding: 17px; }
+      .home-hero { gap: 32px; }
+    }
+    @media (max-width: 760px) {
+      .home-header .brand { font-size: 18px; }
+      .home-header { width: calc(100% - 36px); height: 64px; }
+      .home-header-right { gap: 12px; }
+      .home-nav-link { display: none; }
+      .home-main { width: calc(100% - 36px); padding-top: 37px; }
+      .home-hero { grid-template-columns: minmax(0, 1fr); gap: 27px; max-width: 520px; margin: 0 auto; }
+      .home-hero > *, .home-list-card { min-width: 0; }
+      .home-copy { padding-bottom: 0; }
+      .home-copy h1 { max-width: 450px; font-size: clamp(38px, 9vw, 52px); }
+      .home-copy > p { font-size: 13px; }
+      .home-proof { margin-top: 16px; }
+      .home-features { margin-top: 28px; }
+      .home-feature { padding: 12px 10px; }
+      .home-feature p { font-size: 9px; }
+      .home-footer { margin-top: 24px; }
+      .app { display: block; }
+      body.results-view .app { display: block; }
+      .sidebar { position: static; width: 100%; height: auto; padding: 13px 17px; border-right: 0; border-bottom: 1px solid var(--line); }
+      .brand { padding: 0 3px; }
+      .sidebar .nav-label, .sidebar .nav, .sidebar-bottom { display: none; }
+      main { padding: 0 18px 38px; }
+      .topbar { min-height: 58px; }
+      .welcome { margin: 27px 0 20px; }
+      .welcome { align-items: flex-start; flex-direction: column; gap: 13px; }
+      .updated { display: none; }
+      .content-grid { grid-template-columns: 1fr; }
+      .list-card { padding: 18px; }
+      .results-column { grid-row: 1; }
+      .store-summary-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 440px) {
+      .home-header { width: calc(100% - 28px); }
+      .home-header .brand { font-size: 17px; }
+      .home-header-right { gap: 6px; }
+      .home-header .language-select { width: 76px; padding-right: 18px; padding-left: 6px; font-size: 9px; }
+      .home-header .location-button { max-width: 132px; padding-right: 7px; padding-left: 7px; }
+      .home-main { width: calc(100% - 28px); padding-top: 30px; }
+      .home-copy h1 { font-size: 39px; }
+      .home-features { grid-template-columns: 1fr; gap: 8px; }
+      .home-feature { padding: 11px 12px; }
+      .home-feature p { font-size: 10px; }
+      .home-list-card { padding: 17px; }
+      .home-stores { align-items: flex-start; flex-direction: column; }
+      main { padding-right: 13px; padding-left: 13px; }
+      .welcome h1 { font-size: 27px; }
+      .location-button { font-size: 10px; }
+      .topbar-right { gap: 8px; }
+      .other-stores { grid-template-columns: 1fr; }
+      .store-details { gap: 5px; }
+      .store-main { padding-right: 12px; padding-left: 12px; }
+      .savings-note { margin-right: 12px; margin-left: 12px; }
+      .item-prices { padding-right: 12px; padding-left: 12px; }
+    }
+    @media (max-width: 380px) {
+      .home-header { height: auto; min-height: 64px; flex-wrap: wrap; row-gap: 7px; padding: 8px 0; }
+      .home-header-right { width: 100%; justify-content: flex-end; }
+      .home-header .brand { margin-right: auto; }
+    }
+  </style>
+</head>
+<body>
+  <section class="home-screen" id="homeScreen" aria-labelledby="homeTitle">
+    <header class="home-header">
+      <a class="brand" href="#home" data-view="home" aria-label="SmartBuy.ai home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="m9 8 3-5 3 5M9 12v4m6-4v4"/></svg>
+        </span>
+        <span>SmartBuy<span class="ai">.ai</span></span>
+      </a>
+      <div class="home-header-right">
+        <a class="home-nav-link" href="#how-it-works" data-i18n="howItWorks">How it works</a>
+        <select class="language-select" data-language-select aria-label="Select language">
+          <option value="en">🇬🇧 EN</option>
+          <option value="de">🇩🇪 DE</option>
+        </select>
+        <button class="location-button" id="homeLocationButton" type="button" aria-label="Change shopping location" data-i18n-aria="changeLocation">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+          <span id="homeLocationText">Bielefeld, Deutschland</span>
+          <span aria-hidden="true">⌄</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="home-main">
+      <div class="home-hero">
+        <div class="home-copy">
+          <div class="eyebrow"><span class="spark" aria-hidden="true">✳</span> <span data-i18n="personalAssistant">Your personal shopping assistant</span></div>
+          <h1 id="homeTitle"><span data-i18n="heroLine1">Good groceries.</span><br><em data-i18n="heroLine2">Better prices.</em></h1>
+          <p data-i18n="heroDescription">Your list, compared. SmartBuy checks nearby supermarket prices and helps you find the best total for your weekly shop.</p>
+          <div class="home-proof">
+            <div class="proof-avatars" aria-hidden="true"><span>J</span><span>M</span><span>A</span></div>
+            <span data-i18n="lessChecking">Less price-checking, more saving.</span>
+          </div>
+        </div>
+
+        <section class="card list-card home-list-card" aria-labelledby="homeListTitle">
+          <section class="home-location-panel" aria-labelledby="locationFieldLabel">
+            <label class="home-location-title" id="locationFieldLabel" for="homeLocationInput">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span data-i18n="locationFieldLabel">Your shopping location</span>
+            </label>
+            <form class="location-entry" id="locationForm">
+              <input class="location-input" id="homeLocationInput" type="text" data-i18n-placeholder="locationPlaceholder" aria-describedby="locationDemoNote">
+              <button class="save-location-button" type="submit" data-i18n="saveLocation">Save location</button>
+            </form>
+            <button class="use-location-button" id="useCurrentLocation" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3"/></svg>
+              <span data-i18n="useCurrentLocation">Use my current location</span>
+            </button>
+            <div class="home-location-status" id="homeLocationStatus" role="status" aria-live="polite"></div>
+            <div class="home-location-current"><span data-i18n="comparingAround">Comparing around</span> <strong id="homeLocationInline">Bielefeld, Germany</strong></div>
+            <div class="location-demo-note" id="locationDemoNote" data-i18n="locationDemoNote">Your browser will ask permission to share your location. Store matches and prices are sample data.</div>
+          </section>
+          <div class="card-heading">
+            <div>
+              <h2 id="homeListTitle" data-i18n="startList">Start with your shopping list</h2>
+              <p class="card-subtitle" data-i18n="whatNeed">What do you need this week?</p>
+            </div>
+            <span class="count" id="itemCount">3 items</span>
+          </div>
+          <div class="items-editor">
+            <textarea id="shoppingList" aria-label="Shopping list items" data-i18n-aria="shoppingListLabel" spellcheck="false">5 Bananas
+1 Coffee
+1 Bread</textarea>
+            <div class="editor-hint" data-i18n="onePerLine">One item per line — quantities welcome</div>
+          </div>
+          <button class="scan-button" id="scanButton" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1m0-12.8-2.1 2.1m-8.6 8.6-2.1 2.1"/><circle cx="12" cy="12" r="4"/></svg>
+            <span data-i18n="findPrices">Find my best prices</span>
+          </button>
+          <div class="scan-status" id="scanStatus" role="status" aria-live="polite"></div>
+          <div class="home-stores">
+            <span class="home-stores-label" data-i18n="stores">Stores</span>
+            <div class="store-chips" aria-label="Stores included in comparison" data-i18n-aria="storesIncluded">
+              <span class="store-chip selected">ALDI</span>
+              <span class="store-chip selected">Lidl</span>
+              <span class="store-chip selected">REWE</span>
+              <span class="store-chip selected">EDEKA</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="home-features" id="how-it-works" aria-label="How SmartBuy works" data-i18n-aria="howSmartBuyWorks">
+        <article class="home-feature">
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="m3 6 1 1 2-2m-3 7 1 1 2-2m-3 7 1 1 2-2"/></svg></span>
+          <div><strong data-i18n="makeList">Make your list</strong><p data-i18n="addGroceries">Add the groceries you need, quantities included.</p></div>
+        </article>
+        <article class="home-feature">
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4m-5-8v6m-3-3h6"/></svg></span>
+          <div><strong data-i18n="compareNearby">We compare nearby</strong><p data-i18n="basketTotals">See basket totals across local supermarkets.</p></div>
+        </article>
+        <article class="home-feature">
+          <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.3 5.2 5.7.6-4.2 3.9 1.1 5.6-4.9-2.8-4.9 2.8 1.1-5.6L4 8.8l5.7-.6L12 3Z"/></svg></span>
+          <div><strong data-i18n="chooseBestBasket">Choose your best basket</strong><p data-i18n="findStoreBudget">Find a store that fits your list and your budget.</p></div>
+        </article>
+      </section>
+      <div class="home-footer"><strong>SmartBuy.ai</strong> · <span data-i18n="smarterGroceryRun">Your smarter grocery run</span></div>
+    </main>
+  </section>
+
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="m9 8 3-5 3 5M9 12v4m6-4v4"/></svg>
+        </div>
+        <span>SmartBuy<span class="ai">.ai</span></span>
+      </div>
+
+      <div class="nav-label" data-i18n="workspace">Workspace</div>
+      <nav class="nav" aria-label="Main navigation" data-i18n-aria="mainNavigation">
+        <a class="nav-link active" href="#results" data-view="results">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="8" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="15" width="7" height="6" rx="1.5"/></svg>
+          <span data-i18n="dashboard">Dashboard</span>
+        </a>
+        <a class="nav-link" href="#home" data-view="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><path d="m3 6 1 1 2-2m-3 7 1 1 2-2m-3 7 1 1 2-2"/></svg>
+          <span data-i18n="myShoppingList">My shopping list</span>
+        </a>
+        <a class="nav-link" href="#results" data-view="results">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 4-4 4 3 6-7"/></svg>
+          <span data-i18n="priceComparisons">Price comparisons</span>
+        </a>
+        <a class="nav-link" href="#stores" data-view="stores">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6M9 9h.01M15 9h.01"/></svg>
+          <span data-i18n="nearbyStores">Nearby stores</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="tip-card">
+          <div class="tip-title"><span aria-hidden="true">✦</span> <span data-i18n="smarterEveryShop">A little smarter, every shop</span></div>
+          <p data-i18n="compareFullBasket">We compare your full basket, so you can spend less time price-checking.</p>
+        </div>
+        <div class="profile">
+          <div class="avatar" aria-hidden="true">JD</div>
+          <div><div class="profile-name">Jamie Doe</div><div class="profile-plan" data-i18n="freePlan">Free plan</div></div>
+          <span class="profile-more" aria-hidden="true">···</span>
+        </div>
+      </div>
+    </aside>
+
+    <main id="dashboard">
+      <header class="topbar">
+        <div class="breadcrumb"><a href="#home" data-view="home">SmartBuy.ai</a> <span aria-hidden="true">/</span> <strong id="breadcrumbCurrent" data-i18n="priceComparison">Price comparison</strong></div>
+        <div class="topbar-right">
+          <select class="language-select" data-language-select aria-label="Select language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="de">🇩🇪 DE</option>
+          </select>
+          <button class="location-button" id="locationButton" type="button" aria-label="Change shopping location" data-i18n-aria="changeLocation">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span id="locationText">Bielefeld, Deutschland</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <button class="notification" type="button" aria-label="Notifications" data-i18n-aria="notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 13h4"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <section class="welcome">
+        <div>
+          <div class="eyebrow"><span class="spark" aria-hidden="true">✳</span> <span data-i18n="shoppingResults">Your shopping results</span></div>
+          <h1 data-i18n="bestBasketHeadline">Here's your best basket</h1>
+          <p data-i18n="comparedNearby">We compared your list at nearby supermarkets.</p>
+        </div>
+        <button class="sort-button edit-list-button" type="button" id="editListButton" data-i18n="editShoppingList">← Edit shopping list</button>
+      </section>
+
+      <div class="content-grid">
+        <section class="card list-card" id="shopping-list" aria-labelledby="listTitle">
+          <div class="card-heading">
+            <div>
+              <h2 id="listTitle" data-i18n="yourBasket">Your basket</h2>
+              <p class="card-subtitle" data-i18n="itemsInComparison">Items in this comparison</p>
+            </div>
+            <span class="count" id="summaryItemCount">3 items</span>
+          </div>
+          <ul class="basket-summary" id="basketSummary" aria-label="Items being compared" data-i18n-aria="itemsBeingCompared"></ul>
+          <button class="edit-list-inline" type="button" id="editListInline" data-i18n="editList">Edit list</button>
+          <div class="divider"></div>
+          <div class="nearby-title" id="stores">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg>
+            <span data-i18n="comparingStores">Comparing stores near you</span>
+          </div>
+          <div class="store-chips" aria-label="Stores included in comparison" data-i18n-aria="storesIncluded">
+            <span class="store-chip selected">ALDI</span>
+            <span class="store-chip selected">Lidl</span>
+            <span class="store-chip selected">REWE</span>
+            <span class="store-chip selected">EDEKA</span>
+          </div>
+        </section>
+
+        <section class="results-column" id="results" aria-labelledby="resultsTitle">
+          <div class="results-head">
+            <div>
+              <h2 id="resultsTitle" data-i18n="bestMatch">Best match for your basket</h2>
+              <p id="resultsDescription" data-i18n="resultsFoundMany">We found 4 stores with all your items nearby.</p>
+            </div>
+            <button class="sort-button" type="button" id="sortButton">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M7 12h10m-7 5h4"/></svg>
+              <span data-i18n="lowestTotal">Lowest total</span>
+              <span aria-hidden="true">⌄</span>
+            </button>
+          </div>
+
+          <article class="recommended">
+            <div class="recommend-banner">
+              <span>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 2.2 6.2L21 6l-2.2 6.2L25 15l-6.2 2.2L21 24l-6.8-2.2L12 28l-2.2-6.2L3 24l2.2-6.8L-1 15l6.2-2.8L3 6l6.8 2.2z" transform="translate(1 -3) scale(.88)"/></svg>
+                <span data-i18n="smartbuyPick">SMARTBUY PICK</span>
+              </span>
+              <span class="match" data-i18n="bestTotalMatch">Best total price · 98% match</span>
+            </div>
+            <div class="store-main">
+              <div class="store-logo logo-aldi" aria-label="ALDI logo">ALDI</div>
+              <div class="store-info">
+                <div class="store-name-line"><span class="store-name">ALDI Nord</span><span class="best-tag" data-i18n="bestPrice">Best price</span></div>
+                <div class="store-details"><span data-i18n="aldiDistance">📍 1,3 km entfernt</span><span class="dot">·</span><span data-i18n="aldiHours">Geöffnet bis 21 Uhr</span></div>
+              </div>
+              <div class="price-block"><div class="price">8,47&nbsp;€</div><div class="price-label" data-i18n="forWholeList">for your whole list</div></div>
+            </div>
+            <div class="savings-note"><strong data-i18n="savingsAmount">You save 3,28&nbsp;€</strong> <span data-i18n="savingsCompared">compared to the average nearby store price.</span></div>
+            <div class="item-prices" aria-label="ALDI item prices" data-i18n-aria="aldiItemPrices">
+              <span class="item-price">🍌 <strong data-i18n="bananas">Bananas</strong> 1,25&nbsp;€</span>
+              <span class="item-price">☕ <strong data-i18n="coffee">Coffee</strong> 4,49&nbsp;€</span>
+              <span class="item-price">🍞 <strong data-i18n="bread">Bread</strong> 2,73&nbsp;€</span>
+            </div>
+            <div class="choose-store-row">
+              <button class="choose-store-button" type="button" data-store="aldi"><span data-i18n="choose">Choose</span> ALDI Nord</button>
+            </div>
+          </article>
+
+          <div class="other-heading"><h3 data-i18n="otherNearby">Other nearby options</h3><span data-i18n="sortedTotal">Sorted by total price</span></div>
+          <div class="other-stores">
+            <article class="store-card">
+              <div class="store-card-top">
+                <div class="store-logo logo-lidl" aria-label="Lidl logo">LIDL</div>
+                <div class="store-info">
+                  <div class="store-name">Lidl</div>
+                  <div class="store-details"><span>1,9 km</span><span class="dot">·</span><span data-i18n="lidlHours">Geöffnet bis 22 Uhr</span></div>
+                </div>
+              </div>
+              <div class="store-card-bottom">
+                <div><div class="price">9,15&nbsp;€</div><div class="diff">+0,68&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
+                <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+              </div>
+              <div class="store-breakdown"><span data-i18n="bananas">Bananas</span>&nbsp; 1,39&nbsp;€<br><span data-i18n="coffee">Coffee</span>&nbsp; 4,79&nbsp;€<br><span data-i18n="bread">Bread</span>&nbsp; 2,97&nbsp;€</div>
+              <button class="choose-store-button" type="button" data-store="lidl"><span data-i18n="choose">Choose</span> Lidl</button>
+            </article>
+            <article class="store-card">
+              <div class="store-card-top">
+                <div class="store-logo logo-rewe" aria-label="REWE logo">REWE</div>
+                <div class="store-info">
+                  <div class="store-name">REWE</div>
+                  <div class="store-details"><span>0,8 km</span><span class="dot">·</span><span data-i18n="reweHours">Geöffnet bis 22 Uhr</span></div>
+                </div>
+              </div>
+              <div class="store-card-bottom">
+                <div><div class="price">11,75&nbsp;€</div><div class="diff">+3,28&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
+                <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+              </div>
+              <div class="store-breakdown"><span data-i18n="bananas">Bananas</span>&nbsp; 1,69&nbsp;€<br><span data-i18n="coffee">Coffee</span>&nbsp; 6,29&nbsp;€<br><span data-i18n="bread">Bread</span>&nbsp; 3,77&nbsp;€</div>
+              <button class="choose-store-button" type="button" data-store="rewe"><span data-i18n="choose">Choose</span> REWE</button>
+            </article>
+          </div>
+          <div class="footer-note" data-i18n="samplePrices">Prices are sample estimates for this demo and may vary by store and location.</div>
+        </section>
+      </div>
+
+      <section class="store-summary-page" id="storeSummary" aria-labelledby="storeSummaryTitle">
+        <button class="store-summary-back" type="button" id="backToResults" data-i18n="backToResults">← Back to supermarket results</button>
+        <div class="store-summary-heading">
+          <div class="eyebrow"><span class="spark" aria-hidden="true">✳</span> <span data-i18n="storeSummary">Your store summary</span></div>
+          <h1 id="storeSummaryTitle">Your shopping trip</h1>
+          <p data-i18n="selectedBranchDescription">Here's your basket and the selected supermarket branch.</p>
+        </div>
+        <div class="store-summary-grid">
+          <article class="card selected-store-card">
+            <div class="selected-store-identity">
+              <div class="store-logo" id="selectedStoreLogo" aria-hidden="true"></div>
+              <div>
+                <h2 class="selected-store-name" id="selectedStoreName"></h2>
+                <div class="selected-store-subtitle" data-i18n="selectedSupermarket">Selected supermarket</div>
+              </div>
+            </div>
+            <div class="address-block">
+              <span class="address-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              </span>
+              <div>
+                <div class="address-label" data-i18n="storeAddress">Store address</div>
+                <div class="address-text" id="selectedStoreAddress"></div>
+                <div class="address-note" data-i18n="illustrativeAddress">Illustrative address for this demo</div>
+              </div>
+            </div>
+            <a class="directions-button" id="directionsLink" href="#" target="_blank" rel="noopener noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18-6 3V6l6-3m0 15 6 3m-6-3V3m6 18 6-3V3l-6 3m0 15V6m0 0-6-3M15 6l6-3"/></svg>
+              <span data-i18n="openMaps">Open directions in Google Maps</span>
+              <span aria-hidden="true">↗</span>
+            </a>
+            <div class="store-summary-price">
+              <div class="address-label" data-i18n="estimatedTotal">Estimated total for your basket</div>
+              <div class="price" id="selectedStorePrice"></div>
+              <p data-i18n="samplePriceClickdummy">Sample price for this clickdummy</p>
+            </div>
+          </article>
+          <article class="card selected-basket-card">
+            <h2 data-i18n="yourShoppingList">Your shopping list</h2>
+            <p id="selectedBasketCount">Items in your basket</p>
+            <ul class="basket-summary" id="selectedBasketSummary" aria-label="Selected shopping basket" data-i18n-aria="selectedBasket"></ul>
+            <div class="summary-demo-note" data-i18n="demoTravelNote">Store address and prices are illustrative demo data. Check the destination in Maps before travelling.</div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const translations = {
+      en: {
+        howItWorks: "How it works", personalAssistant: "Your personal shopping assistant", heroLine1: "Good groceries.", heroLine2: "Better prices.",
+        shoppingListLabel: "Shopping list items", notifications: "Notifications", selectLanguage: "Select language",
+        heroDescription: "Your list, compared. SmartBuy checks nearby supermarket prices and helps you find the best total for your weekly shop.",
+        lessChecking: "Less price-checking, more saving.", startList: "Start with your shopping list", whatNeed: "What do you need this week?",
+        onePerLine: "One item per line — quantities welcome", findPrices: "Find my best prices", comparingAround: "Comparing around",
+        stores: "Stores", storesIncluded: "Stores included in comparison", howSmartBuyWorks: "How SmartBuy works", makeList: "Make your list",
+        addGroceries: "Add the groceries you need, quantities included.", compareNearby: "We compare nearby",
+        basketTotals: "See basket totals across local supermarkets.", chooseBestBasket: "Choose your best basket",
+        findStoreBudget: "Find a store that fits your list and your budget.", smarterGroceryRun: "Your smarter grocery run",
+        workspace: "Workspace", mainNavigation: "Main navigation", dashboard: "Dashboard", myShoppingList: "My shopping list",
+        priceComparisons: "Price comparisons", nearbyStores: "Nearby stores", smarterEveryShop: "A little smarter, every shop",
+        compareFullBasket: "We compare your full basket, so you can spend less time price-checking.", freePlan: "Free plan",
+        priceComparison: "Price comparison", shoppingResults: "Your shopping results", bestBasketHeadline: "Here's your best basket",
+        comparedNearby: "We compared your list at nearby supermarkets.", editShoppingList: "← Edit shopping list", yourBasket: "Your basket",
+        itemsInComparison: "Items in this comparison", itemsBeingCompared: "Items being compared", editList: "Edit list",
+        comparingStores: "Comparing stores near you", bestMatch: "Best match for your basket", lowestTotal: "Lowest total",
+        smartbuyPick: "SMARTBUY PICK", bestTotalMatch: "Best total price · 98% match", bestPrice: "Best price",
+        aldiDistance: "📍 1.3 km away", aldiHours: "Open until 9 PM", forWholeList: "for your whole list",
+        savingsAmount: "You save €3.28", savingsCompared: "compared to the average nearby store price.", aldiItemPrices: "ALDI item prices",
+        bananas: "Bananas", coffee: "Coffee", bread: "Bread", choose: "Choose", otherNearby: "Other nearby options",
+        sortedTotal: "Sorted by total price", lidlHours: "Open until 10 PM", reweHours: "Open until 10 PM", vsBest: "vs. best",
+        details: "Details", hideDetails: "Hide details", samplePrices: "Prices are sample estimates for this demo and may vary by store and location.",
+        backToResults: "← Back to supermarket results", storeSummary: "Your store summary", selectedBranchDescription: "Here's your basket and the selected supermarket branch.",
+        selectedSupermarket: "Selected supermarket", storeAddress: "Store address", illustrativeAddress: "Illustrative address for this demo",
+        openMaps: "Open directions in Google Maps", estimatedTotal: "Estimated total for your basket",
+        samplePriceClickdummy: "Sample price for this clickdummy", yourShoppingList: "Your shopping list",
+        selectedBasket: "Selected shopping basket", demoTravelNote: "Store address and prices are illustrative demo data. Check the destination in Maps before travelling.",
+        changeLocation: "Change shopping location", locationPrompt: "Enter your city or postal code:", addItemError: "Add at least one item to your list to compare prices.",
+        locationFieldLabel: "Your shopping location", locationPlaceholder: "City, postal code, or address",
+        saveLocation: "Save location", useCurrentLocation: "Use my current location", locationDemoNote: "Your browser will ask permission to share your location. Store matches and prices are sample data.",
+        locationRequired: "Enter a city, postal code, or address first.", locationSaved: "Shopping location set to {location}.",
+        locating: "Finding your location…", currentLocationSet: "Current location set to {coordinates}.",
+        geolocationUnavailable: "Location is not available in this browser.", locationPermissionDenied: "Location permission was denied. You can enter a location manually instead.",
+        locationPositionUnavailable: "Your location could not be determined. Try entering it manually.",
+        locationTimeout: "Location request timed out. Please try again or enter it manually.",
+        locationUnknownError: "Something went wrong while getting your location. Please try again.",
+        locationNeedsSecureContext: "Location access requires a secure page (HTTPS) or localhost.",
+        gpsPrefix: "GPS", gpsDirectionsOrigin: "Your current GPS coordinates",
+        scanning: "Scanning nearby stores…", scanningComplete: "Done! Compared {count} {items} at 4 nearby stores.",
+        item: "item", items: "items", resultsHeadingBasket: "Best match for your basket", resultsHeadingItem: "Best match for your item",
+        resultsFoundOne: "We found 4 stores with your item nearby.", resultsFoundMany: "We found 4 stores with your items nearby.",
+        locationUpdated: "Location updated to {location}. Scan again to compare nearby stores.",
+        sortedMessage: "Stores are sorted by the total price of your basket.", selectedItems: "{count} {items} in your basket",
+        shoppingAt: "Shopping at {store}", locationFallback: "Bielefeld, Germany"
+      },
+      de: {
+        howItWorks: "So funktioniert's", personalAssistant: "Dein persönlicher Einkaufsassistent", heroLine1: "Gut einkaufen.",
+        heroLine2: "Weniger zahlen.", heroDescription: "Deine Einkaufsliste im Preisvergleich. SmartBuy vergleicht Supermärkte in deiner Nähe und findet den günstigsten Gesamtpreis.",
+        lessChecking: "Weniger Preise vergleichen, mehr sparen.", startList: "Erstelle deine Einkaufsliste", whatNeed: "Was brauchst du diese Woche?",
+        onePerLine: "Ein Artikel pro Zeile — Mengenangaben möglich", findPrices: "Günstigste Preise finden", comparingAround: "Preisvergleich in",
+        stores: "Märkte", storesIncluded: "Märkte im Preisvergleich", howSmartBuyWorks: "So funktioniert SmartBuy", makeList: "Einkaufsliste erstellen",
+        addGroceries: "Füge benötigte Artikel und Mengen hinzu.", compareNearby: "Preise in deiner Nähe",
+        basketTotals: "Vergleiche Warenkorbpreise lokaler Supermärkte.", chooseBestBasket: "Günstigsten Markt finden",
+        findStoreBudget: "Finde den passenden Markt für deine Liste und dein Budget.", smarterGroceryRun: "Cleverer einkaufen",
+        shoppingListLabel: "Artikel auf der Einkaufsliste", notifications: "Benachrichtigungen", selectLanguage: "Sprache auswählen",
+        workspace: "Arbeitsbereich", mainNavigation: "Hauptnavigation", dashboard: "Übersicht", myShoppingList: "Meine Einkaufsliste",
+        priceComparisons: "Preisvergleiche", nearbyStores: "Märkte in der Nähe", smarterEveryShop: "Bei jedem Einkauf cleverer",
+        compareFullBasket: "Wir vergleichen deinen gesamten Warenkorb, damit du weniger Zeit mit der Preissuche verbringst.", freePlan: "Kostenloser Tarif",
+        priceComparison: "Preisvergleich", shoppingResults: "Deine Suchergebnisse", bestBasketHeadline: "Hier ist dein günstigster Warenkorb",
+        comparedNearby: "Wir haben deine Liste bei Supermärkten in der Nähe verglichen.", editShoppingList: "← Einkaufsliste bearbeiten",
+        yourBasket: "Dein Warenkorb", itemsInComparison: "Artikel in diesem Preisvergleich", itemsBeingCompared: "Verglichene Artikel",
+        editList: "Liste bearbeiten", comparingStores: "Märkte in deiner Nähe im Vergleich", bestMatch: "Bester Treffer für deinen Warenkorb",
+        lowestTotal: "Niedrigster Gesamtpreis", smartbuyPick: "SMARTBUY-EMPFEHLUNG", bestTotalMatch: "Günstigster Gesamtpreis · 98 % Treffer",
+        bestPrice: "Günstigster Preis", aldiDistance: "📍 1,3 km entfernt", aldiHours: "Geöffnet bis 21 Uhr",
+        forWholeList: "für deine gesamte Liste", savingsAmount: "Du sparst 3,28 €",
+        savingsCompared: "im Vergleich zum durchschnittlichen Preis in deiner Nähe.", aldiItemPrices: "ALDI-Artikelpreise",
+        bananas: "Bananen", coffee: "Kaffee", bread: "Brot", choose: "Auswählen", otherNearby: "Weitere Märkte in der Nähe",
+        sortedTotal: "Nach Gesamtpreis sortiert", lidlHours: "Geöffnet bis 22 Uhr", reweHours: "Geöffnet bis 22 Uhr",
+        vsBest: "mehr als am günstigsten", details: "Details", hideDetails: "Details ausblenden",
+        samplePrices: "Die Preise sind Beispielwerte und können je nach Markt und Standort abweichen.",
+        backToResults: "← Zurück zum Marktvergleich", storeSummary: "Deine Marktübersicht",
+        selectedBranchDescription: "Hier findest du deinen Warenkorb und den ausgewählten Supermarkt.",
+        selectedSupermarket: "Ausgewählter Supermarkt", storeAddress: "Marktadresse",
+        illustrativeAddress: "Beispieladresse für diese Demo", openMaps: "Route in Google Maps öffnen",
+        estimatedTotal: "Geschätzter Gesamtpreis für deinen Warenkorb", samplePriceClickdummy: "Beispielpreis für diesen Klickdummy",
+        yourShoppingList: "Deine Einkaufsliste", selectedBasket: "Ausgewählter Warenkorb",
+        demoTravelNote: "Marktadresse und Preise sind Beispieldaten. Bitte prüfe das Ziel in Maps, bevor du losfährst.",
+        changeLocation: "Standort ändern", locationPrompt: "Stadt oder Postleitzahl eingeben:",
+        locationFieldLabel: "Dein Einkaufsstandort", locationPlaceholder: "Stadt, Postleitzahl oder Adresse",
+        saveLocation: "Standort speichern", useCurrentLocation: "Meinen aktuellen Standort verwenden",
+        locationDemoNote: "Dein Browser fragt nach der Standortfreigabe. Marktangebote und Preise sind Beispieldaten.",
+        locationRequired: "Gib zuerst eine Stadt, Postleitzahl oder Adresse ein.", locationSaved: "Einkaufsstandort auf {location} gesetzt.",
+        locating: "Standort wird ermittelt …", currentLocationSet: "Aktueller Standort: {coordinates}.",
+        geolocationUnavailable: "Die Standortbestimmung ist in diesem Browser nicht verfügbar.",
+        locationPermissionDenied: "Standortzugriff wurde abgelehnt. Du kannst den Standort stattdessen manuell eingeben.",
+        locationPositionUnavailable: "Dein Standort konnte nicht ermittelt werden. Gib ihn stattdessen manuell ein.",
+        locationTimeout: "Die Standortbestimmung hat zu lange gedauert. Bitte erneut versuchen oder manuell eingeben.",
+        locationUnknownError: "Beim Abrufen deines Standorts ist ein Fehler aufgetreten. Bitte erneut versuchen.",
+        locationNeedsSecureContext: "Der Standortzugriff erfordert eine sichere Seite (HTTPS) oder localhost.",
+        gpsPrefix: "GPS", gpsDirectionsOrigin: "Deine aktuellen GPS-Koordinaten",
+        addItemError: "Füge mindestens einen Artikel hinzu, um Preise zu vergleichen.", scanning: "Märkte in der Nähe werden verglichen …",
+        scanningComplete: "Fertig! {count} {items} bei 4 Märkten in der Nähe verglichen.",
+        item: "Artikel", items: "Artikel", resultsHeadingBasket: "Bester Treffer für deinen Warenkorb",
+        resultsHeadingItem: "Bester Treffer für deinen Artikel", resultsFoundOne: "Wir haben 4 Märkte in deiner Nähe für deinen Artikel gefunden.",
+        resultsFoundMany: "Wir haben 4 Märkte in deiner Nähe für deine Artikel gefunden.",
+        locationUpdated: "Standort auf {location} geändert. Vergleiche erneut die Preise in deiner Nähe.",
+        sortedMessage: "Die Märkte sind nach dem Gesamtpreis deines Warenkorbs sortiert.",
+        selectedItems: "{count} {items} in deinem Warenkorb", shoppingAt: "Einkaufen bei {store}", locationFallback: "Bielefeld, Deutschland"
+      }
+    };
+
+    let activeLanguage = localStorage.getItem("smartbuy-language") === "de" ? "de" : "en";
+    let resultsMessage = { type: "found" };
+    const sampleLists = {
+      en: "5 Bananas\n1 Coffee\n1 Bread",
+      de: "5 Bananen\n1 Kaffee\n1 Brot"
+    };
+
+    const shoppingList = document.querySelector("#shoppingList");
+    const itemCount = document.querySelector("#itemCount");
+    const summaryItemCount = document.querySelector("#summaryItemCount");
+    const basketSummary = document.querySelector("#basketSummary");
+    const scanButton = document.querySelector("#scanButton");
+    const scanStatus = document.querySelector("#scanStatus");
+    const locationText = document.querySelector("#locationText");
+    const homeLocationText = document.querySelector("#homeLocationText");
+    const homeLocationInline = document.querySelector("#homeLocationInline");
+    const selectedBasketSummary = document.querySelector("#selectedBasketSummary");
+    const scanButtonIcon = scanButton.querySelector("svg").outerHTML;
+    const stores = {
+      aldi: { name: "ALDI Nord", address: "Musterstraße 1, 33602 Bielefeld", price: "8,47 €", logo: "ALDI", logoClass: "logo-aldi", mapQuery: "ALDI Nord, Musterstraße 1, 33602 Bielefeld (Demoadresse)" },
+      lidl: { name: "Lidl", address: "Beispielweg 2, 33602 Bielefeld", price: "9,15 €", logo: "LIDL", logoClass: "logo-lidl", mapQuery: "Lidl, Beispielweg 2, 33602 Bielefeld (Demoadresse)" },
+      rewe: { name: "REWE", address: "Demoallee 3, 33602 Bielefeld", price: "11,75 €", logo: "REWE", logoClass: "logo-rewe", mapQuery: "REWE, Demoallee 3, 33602 Bielefeld (Demoadresse)" }
+    };
+
+    function getItems() {
+      return shoppingList.value.split("\n").map((item) => item.trim()).filter(Boolean);
+    }
+
+    function text(key, values = {}) {
+      return translations[activeLanguage][key].replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = activeLanguage;
+      document.querySelectorAll("[data-i18n]").forEach((element) => {
+        element.textContent = text(element.dataset.i18n);
+      });
+      document.querySelectorAll("[data-i18n-aria]").forEach((element) => {
+        element.setAttribute("aria-label", text(element.dataset.i18nAria));
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+        element.setAttribute("placeholder", text(element.dataset.i18nPlaceholder));
+      });
+      document.querySelectorAll("[data-language-select]").forEach((select) => {
+        select.value = activeLanguage;
+        select.setAttribute("aria-label", text("selectLanguage"));
+      });
+      document.title = activeLanguage === "de" ? "SmartBuy.ai — Clever einkaufen" : "SmartBuy.ai — A smarter way to shop";
+      const currentLocation = localStorage.getItem("smartbuy-location") || "Bielefeld";
+      const coordinates = localStorage.getItem("smartbuy-coordinates");
+      const displayLocation = coordinates
+        ? `${text("gpsPrefix")}: ${currentLocation}`
+        : `${currentLocation}, ${activeLanguage === "de" ? "Deutschland" : "Germany"}`;
+      document.querySelector("#homeLocationInput").value = currentLocation;
+      homeLocationText.textContent = displayLocation;
+      locationText.textContent = displayLocation;
+      homeLocationInline.textContent = displayLocation;
+
+      document.querySelector("#scanButton").disabled = false;
+      scanButton.innerHTML = `${scanButtonIcon}<span data-i18n="findPrices">${text("findPrices")}</span>`;
+      document.querySelectorAll(".details-button").forEach((button) => {
+        const key = button.getAttribute("aria-expanded") === "true" ? "hideDetails" : "details";
+        button.querySelector("span").textContent = text(key);
+      });
+      updateItemCount();
+      renderResultsDescription();
+
+      const isSampleEnglish = shoppingList.value === sampleLists.en;
+      const isSampleGerman = shoppingList.value === sampleLists.de;
+      if (isSampleEnglish || isSampleGerman) {
+        shoppingList.value = sampleLists[activeLanguage];
+        updateItemCount();
+      }
+
+      if (document.body.classList.contains("store-view")) {
+        const selectedStoreId = window.history.state?.storeId || window.location.hash.match(/^#store-(.+)$/)?.[1];
+        if (selectedStoreId && stores[selectedStoreId]) renderStoreSummary(selectedStoreId);
+      } else if (document.body.classList.contains("results-view")) {
+        document.querySelector("#breadcrumbCurrent").textContent = text("priceComparison");
+      }
+    }
+
+    function updateItemCount() {
+      const items = getItems();
+      const countLabel = `${items.length} ${items.length === 1 ? text("item") : text("items")}`;
+      itemCount.textContent = countLabel;
+      summaryItemCount.textContent = countLabel;
+      basketSummary.replaceChildren();
+
+      items.forEach((item) => {
+        const match = item.match(/^(\d+(?:\.\d+)?\s*(?:x|×)?\s+)(.+)$/i);
+        const row = document.createElement("li");
+        if (match) {
+          const quantity = document.createElement("span");
+          quantity.className = "basket-quantity";
+          quantity.textContent = match[1].trim();
+          const name = document.createElement("span");
+          name.textContent = match[2].trim();
+          row.append(quantity, name);
+        } else {
+          row.textContent = item;
+        }
+        basketSummary.append(row);
+      });
+    }
+
+    function renderResultsDescription() {
+      const description = document.querySelector("#resultsDescription");
+      if (resultsMessage.type === "complete") {
+        description.textContent = text("scanningComplete", {
+          count: resultsMessage.count,
+          items: resultsMessage.count === 1 ? text("item") : text("items")
+        });
+      } else if (resultsMessage.type === "location") {
+        description.textContent = text("locationUpdated", { location: resultsMessage.location });
+      } else if (resultsMessage.type === "sorted") {
+        description.textContent = text("sortedMessage");
+      } else {
+        description.textContent = getItems().length === 1 ? text("resultsFoundOne") : text("resultsFoundMany");
+      }
+    }
+
+    function showView(view, updateHistory = true, storeId = null) {
+      const isResults = view !== "home";
+      document.body.classList.toggle("results-view", isResults);
+      document.body.classList.toggle("store-view", view === "store");
+      document.querySelectorAll(".nav-link[data-view]").forEach((link) => {
+        link.classList.toggle("active", link.dataset.view === (isResults ? "results" : "home"));
+      });
+      if (updateHistory) {
+        const nextHash = view === "store" ? `#store-${storeId}` : isResults ? "#results" : "#home";
+        if (window.location.hash !== nextHash || view === "store") window.history.pushState({ view, storeId }, "", nextHash);
+      }
+      window.scrollTo(0, 0);
+      if (view === "stores") document.querySelector("#stores").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function renderStoreSummary(storeId) {
+      const store = stores[storeId];
+      if (!store) return;
+
+      const logo = document.querySelector("#selectedStoreLogo");
+      logo.className = `store-logo ${store.logoClass}`;
+      logo.textContent = store.logo;
+      document.querySelector("#selectedStoreName").textContent = store.name;
+      document.querySelector("#selectedStoreAddress").textContent = store.address;
+      document.querySelector("#selectedStorePrice").textContent = store.price;
+      document.querySelector("#directionsLink").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.mapQuery)}`;
+      document.querySelector("#selectedBasketCount").textContent = text("selectedItems", {
+        count: getItems().length,
+        items: getItems().length === 1 ? text("item") : text("items")
+      });
+      selectedBasketSummary.replaceChildren(...Array.from(basketSummary.children, (row) => row.cloneNode(true)));
+      document.querySelector("#breadcrumbCurrent").textContent = store.name;
+      document.querySelector("#storeSummaryTitle").textContent = text("shoppingAt", { store: store.name });
+    }
+
+    function selectStore(storeId, updateHistory = true) {
+      if (!stores[storeId]) return;
+      renderStoreSummary(storeId);
+      showView("store", updateHistory, storeId);
+    }
+
+    shoppingList.addEventListener("input", updateItemCount);
+
+    scanButton.addEventListener("click", () => {
+      const items = getItems();
+      if (items.length === 0) {
+        scanStatus.textContent = text("addItemError");
+        shoppingList.focus();
+        return;
+      }
+
+      scanButton.disabled = true;
+      scanButton.innerHTML = `<span class="loading-dot" aria-hidden="true">◌</span> ${text("scanning")}`;
+      scanStatus.textContent = "";
+      window.setTimeout(() => {
+        scanButton.disabled = false;
+        scanButton.innerHTML = `${scanButtonIcon}<span data-i18n="findPrices">${text("findPrices")}</span>`;
+        updateItemCount();
+        document.querySelector("#resultsTitle").textContent = text(items.length === 1 ? "resultsHeadingItem" : "resultsHeadingBasket");
+        resultsMessage = { type: "complete", count: items.length };
+        renderResultsDescription();
+        showView("results");
+      }, 1100);
+    });
+
+    document.querySelectorAll("[data-view]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        event.preventDefault();
+        showView(link.dataset.view);
+      });
+    });
+
+    document.querySelector("#editListButton").addEventListener("click", () => showView("home"));
+    document.querySelector("#editListInline").addEventListener("click", () => showView("home"));
+
+    document.querySelectorAll(".details-button").forEach((button) => {
+      button.addEventListener("click", () => {
+        const card = button.closest(".store-card");
+        const expanded = card.classList.toggle("expanded");
+        button.setAttribute("aria-expanded", String(expanded));
+        button.querySelector("span").textContent = text(expanded ? "hideDetails" : "details");
+      });
+    });
+
+    document.querySelectorAll(".choose-store-button").forEach((button) => {
+      button.addEventListener("click", () => selectStore(button.dataset.store));
+    });
+    document.querySelector("#backToResults").addEventListener("click", () => {
+      if (window.history.state?.view === "store") {
+        window.history.back();
+      } else {
+        showView("results");
+      }
+    });
+
+    function saveLocation(location, coordinates = null) {
+      const value = location.trim();
+      if (!value) {
+        document.querySelector("#homeLocationStatus").textContent = text("locationRequired");
+        document.querySelector("#homeLocationInput").focus();
+        return false;
+      }
+
+      localStorage.setItem("smartbuy-location", value);
+      if (coordinates) {
+        localStorage.setItem("smartbuy-coordinates", JSON.stringify(coordinates));
+      } else {
+        localStorage.removeItem("smartbuy-coordinates");
+      }
+
+      resultsMessage = { type: "location", location: value };
+      applyLanguage();
+      const locationDisplay = localStorage.getItem("smartbuy-coordinates")
+        ? `${text("gpsPrefix")}: ${value}`
+        : `${value}, ${activeLanguage === "de" ? "Deutschland" : "Germany"}`;
+      document.querySelector("#homeLocationStatus").textContent = coordinates
+        ? text("currentLocationSet", { coordinates: value })
+        : text("locationSaved", { location: locationDisplay });
+      renderResultsDescription();
+      return true;
+    }
+
+    function changeLocation() {
+      const nextLocation = window.prompt(text("locationPrompt"), document.querySelector("#homeLocationInput").value);
+      if (nextLocation !== null) saveLocation(nextLocation);
+    }
+
+    document.querySelector("#locationForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      saveLocation(document.querySelector("#homeLocationInput").value);
+    });
+
+    document.querySelector("#useCurrentLocation").addEventListener("click", () => {
+      const button = document.querySelector("#useCurrentLocation");
+      const status = document.querySelector("#homeLocationStatus");
+      if (!window.isSecureContext) {
+        status.textContent = text("locationNeedsSecureContext");
+        return;
+      }
+      if (!navigator.geolocation) {
+        status.textContent = text("geolocationUnavailable");
+        return;
+      }
+
+      button.disabled = true;
+      status.textContent = text("locating");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          button.disabled = false;
+          const { latitude, longitude, accuracy } = position.coords;
+          const coordinates = { latitude, longitude, accuracy };
+          const coordinateLabel = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+          saveLocation(coordinateLabel, coordinates);
+        },
+        (error) => {
+          button.disabled = false;
+          const messages = {
+            1: "locationPermissionDenied",
+            2: "locationPositionUnavailable",
+            3: "locationTimeout"
+          };
+          status.textContent = text(messages[error.code] || "locationUnknownError");
+        },
+        { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+      );
+    });
+
+    document.querySelector("#locationButton").addEventListener("click", changeLocation);
+    document.querySelector("#homeLocationButton").addEventListener("click", changeLocation);
+
+    document.querySelector("#sortButton").addEventListener("click", () => {
+      resultsMessage = { type: "sorted" };
+      renderResultsDescription();
+    });
+
+    document.querySelectorAll("[data-language-select]").forEach((select) => {
+      select.addEventListener("change", () => {
+        const oldSample = shoppingList.value === sampleLists[activeLanguage];
+        activeLanguage = select.value;
+        localStorage.setItem("smartbuy-language", activeLanguage);
+        if (oldSample) shoppingList.value = sampleLists[activeLanguage];
+        scanStatus.textContent = "";
+        document.querySelector("#homeLocationStatus").textContent = "";
+        applyLanguage();
+      });
+    });
+
+    updateItemCount();
+    window.addEventListener("popstate", (event) => {
+      if (event.state?.view === "store" && stores[event.state.storeId]) {
+        renderStoreSummary(event.state.storeId);
+        showView("store", false);
+      } else {
+        document.querySelector("#breadcrumbCurrent").textContent = text("priceComparison");
+        showView(window.location.hash === "#results" ? "results" : "home", false);
+      }
+    });
+    if (window.location.hash === "#results") showView("results", false);
+    const initialStore = window.location.hash.match(/^#store-(.+)$/)?.[1];
+    if (initialStore && stores[initialStore]) selectStore(initialStore, false);
+    applyLanguage();
+  </script>
+</body>
+</html>
