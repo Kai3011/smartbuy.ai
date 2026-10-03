@@ -165,6 +165,28 @@
     .basket-summary li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 1px; border-bottom: 1px solid #f0f1ee; color: #596259; font-size: 11px; }
     .basket-summary li:last-child { border-bottom: 0; }
     .basket-summary .basket-quantity { color: #8a9289; }
+    .basket-check-row { align-items: center; }
+    .checklist-item { display: flex; align-items: center; gap: 9px; min-width: 0; flex: 1; cursor: pointer; }
+    .checklist-item input { width: 17px; height: 17px; flex: 0 0 auto; margin: 0; accent-color: var(--green); cursor: pointer; }
+    .checklist-brand-icon { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 28px; border: 1px solid #e9ece6; border-radius: 8px; color: #485448; background: #f5f7f2; font-size: 10px; font-weight: 800; letter-spacing: -.4px; }
+    .checklist-brand-icon.brand-chiquita { color: #6c5410; background: #fff5c9; border-color: #f1e2a4; }
+    .checklist-brand-icon.brand-moreno { color: #fff; background: #604235; border-color: #604235; }
+    .checklist-brand-icon.brand-goldahren { color: #6d5317; background: #fff2cf; border-color: #ecdba9; }
+    .checklist-brand-icon.brand-bellarom { color: #fff; background: #7d283b; border-color: #7d283b; }
+    .checklist-brand-icon.brand-grafschafter { color: #fff; background: #395b8d; border-color: #395b8d; }
+    .checklist-brand-icon.brand-jacobs, .checklist-brand-icon.brand-jacobs-kronung { color: #fff; background: #8d2834; border-color: #8d2834; }
+    .checklist-brand-icon.brand-harry { color: #fff; background: #315b9a; border-color: #315b9a; }
+    .checklist-item-info { display: grid; gap: 3px; min-width: 0; flex: 1; }
+    .checklist-item-name { color: #3e483f; font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
+    .checklist-item-product { color: #788078; font-size: 9px; font-weight: 450; overflow-wrap: anywhere; }
+    .checklist-item-price { min-width: 62px; margin-left: auto; color: #3e483f; font-size: 10px; font-weight: 650; text-align: right; white-space: nowrap; }
+    .checklist-item input:checked + .checklist-item-info .checklist-item-name { color: #929990; text-decoration: line-through; }
+    .checklist-item input:checked + .checklist-item-info .checklist-item-product { color: #a0a69f; }
+    .selected-basket-card > p { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .checklist-progress { color: var(--green); font-weight: 700; white-space: nowrap; }
+    .basket-item-main { display: grid; gap: 3px; min-width: 0; }
+    .basket-item-name { color: #3e483f; font-weight: 620; overflow-wrap: anywhere; }
+    .basket-item-product { color: #788078; font-size: 9px; font-weight: 450; overflow-wrap: anywhere; }
     .edit-list-inline { margin-top: 9px; padding: 0; border: 0; color: var(--green); background: transparent; font-size: 10px; font-weight: 650; }
     .edit-list-inline:hover { color: var(--green-dark); text-decoration: underline; }
     .scan-button {
@@ -213,9 +235,13 @@
     .price-label { margin-top: 1px; color: #929990; font-size: 9px; }
     .savings-note { margin: 0 16px 13px; padding: 9px 10px; border-radius: 7px; color: #4d7553; background: #f4f8f1; font-size: 10px; line-height: 1.45; }
     .savings-note strong { color: #31633d; }
-    .item-prices { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 14px; }
-    .item-price { display: flex; align-items: center; gap: 5px; padding: 5px 7px; border: 1px solid #edf0eb; border-radius: 6px; color: #727a72; font-size: 9px; }
-    .item-price strong { color: #3e483f; font-weight: 650; }
+    .item-prices { display: grid; gap: 6px; padding: 0 16px 14px; }
+    .item-price { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 1px solid #edf0eb; border-radius: 7px; color: #727a72; font-size: 9px; }
+    .item-price-icon { flex: 0 0 auto; font-size: 14px; }
+    .item-price-info { display: grid; gap: 3px; min-width: 0; flex: 1; }
+    .item-price-name { color: #3e483f; font-size: 9px; font-weight: 650; }
+    .item-price-brand { color: #788078; font-size: 9px; overflow-wrap: anywhere; }
+    .item-price-amount { color: #3e483f; font-weight: 650; white-space: nowrap; }
     .choose-store-row { display: flex; justify-content: flex-end; padding: 0 16px 14px; }
     .choose-store-button { padding: 8px 11px; border: 1px solid var(--green-dark); border-radius: 7px; color: #fff; background: var(--green-dark); font-size: 10px; font-weight: 650; box-shadow: 0 3px 8px #28633e24; transition: background .18s, transform .18s; }
     .choose-store-button:hover { border-color: #1d5030; background: #1d5030; transform: translateY(-1px); }
@@ -230,6 +256,9 @@
     .store-card .store-logo { width: 34px; height: 34px; border-radius: 9px; font-size: 10px; }
     .store-card .store-name { font-size: 11px; }
     .store-card .store-details { font-size: 9px; margin-top: 4px; }
+    .store-brand-preview { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px; }
+    .brand-preview-chip { padding: 4px 6px; border: 1px solid #edf0eb; border-radius: 5px; color: #5e6b5e; background: #fafbf9; font-size: 8px; line-height: 1.35; }
+    .brand-preview-chip strong { color: #3e483f; font-weight: 700; }
     .store-card-bottom { display: flex; align-items: flex-end; justify-content: space-between; margin-top: 11px; padding-top: 9px; border-top: 1px solid #f0f1ee; }
     .store-card .price { font-size: 18px; }
     .diff { color: #a47a62; font-size: 9px; }
@@ -237,6 +266,10 @@
     .details-button svg { width: 12px; height: 12px; transition: transform .2s; }
     .store-card.expanded .details-button svg { transform: rotate(180deg); }
     .store-breakdown { display: none; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f1ee; color: #788078; font-size: 9px; line-height: 1.7; }
+    .store-breakdown-row { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; }
+    .store-breakdown-name { color: #515b51; font-weight: 600; }
+    .store-breakdown-product { display: block; color: #858d84; font-size: 8px; font-weight: 450; }
+    .store-breakdown-price { color: #3e483f; font-weight: 650; white-space: nowrap; }
     .store-card.expanded .store-breakdown { display: block; }
     .scan-status { min-height: 15px; margin-top: 8px; color: var(--green); text-align: center; font-size: 10px; }
     .scan-status:empty { display: none; }
@@ -565,11 +598,7 @@
               <div class="price-block"><div class="price">8,47&nbsp;€</div><div class="price-label" data-i18n="forWholeList">for your whole list</div></div>
             </div>
             <div class="savings-note"><strong data-i18n="savingsAmount">You save 3,28&nbsp;€</strong> <span data-i18n="savingsCompared">compared to the average nearby store price.</span></div>
-            <div class="item-prices" aria-label="ALDI item prices" data-i18n-aria="aldiItemPrices">
-              <span class="item-price">🍌 <strong data-i18n="bananas">Bananas</strong> 1,25&nbsp;€</span>
-              <span class="item-price">☕ <strong data-i18n="coffee">Coffee</strong> 4,49&nbsp;€</span>
-              <span class="item-price">🍞 <strong data-i18n="bread">Bread</strong> 2,73&nbsp;€</span>
-            </div>
+            <div class="item-prices" id="aldiProducts" aria-label="ALDI item prices" data-i18n-aria="aldiItemPrices"></div>
             <div class="choose-store-row">
               <button class="choose-store-button" type="button" data-store="aldi"><span data-i18n="choose">Choose</span> ALDI Nord</button>
             </div>
@@ -585,13 +614,14 @@
                   <div class="store-details"><span>1,9 km</span><span class="dot">·</span><span data-i18n="lidlHours">Geöffnet bis 22 Uhr</span></div>
                 </div>
               </div>
+              <div class="store-brand-preview" id="lidlBrandPreview" aria-label="Lidl product brands" data-i18n-aria="productBrandPreview"></div>
               <div class="store-card-bottom">
                 <div><div class="price">9,15&nbsp;€</div><div class="diff">+0,68&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
                 <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
               </div>
-              <div class="store-breakdown"><span data-i18n="bananas">Bananas</span>&nbsp; 1,39&nbsp;€<br><span data-i18n="coffee">Coffee</span>&nbsp; 4,79&nbsp;€<br><span data-i18n="bread">Bread</span>&nbsp; 2,97&nbsp;€</div>
+              <div class="store-breakdown" id="lidlBreakdown"></div>
               <button class="choose-store-button" type="button" data-store="lidl"><span data-i18n="choose">Choose</span> Lidl</button>
             </article>
             <article class="store-card">
@@ -602,13 +632,14 @@
                   <div class="store-details"><span>0,8 km</span><span class="dot">·</span><span data-i18n="reweHours">Geöffnet bis 22 Uhr</span></div>
                 </div>
               </div>
+              <div class="store-brand-preview" id="reweBrandPreview" aria-label="REWE product brands" data-i18n-aria="productBrandPreview"></div>
               <div class="store-card-bottom">
                 <div><div class="price">11,75&nbsp;€</div><div class="diff">+3,28&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
                 <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
               </div>
-              <div class="store-breakdown"><span data-i18n="bananas">Bananas</span>&nbsp; 1,69&nbsp;€<br><span data-i18n="coffee">Coffee</span>&nbsp; 6,29&nbsp;€<br><span data-i18n="bread">Bread</span>&nbsp; 3,77&nbsp;€</div>
+              <div class="store-breakdown" id="reweBreakdown"></div>
               <button class="choose-store-button" type="button" data-store="rewe"><span data-i18n="choose">Choose</span> REWE</button>
             </article>
           </div>
@@ -654,9 +685,13 @@
             </div>
           </article>
           <article class="card selected-basket-card">
-            <h2 data-i18n="yourShoppingList">Your shopping list</h2>
-            <p id="selectedBasketCount">Items in your basket</p>
-            <ul class="basket-summary" id="selectedBasketSummary" aria-label="Selected shopping basket" data-i18n-aria="selectedBasket"></ul>
+            <h2 data-i18n="shoppingChecklist">Shopping checklist</h2>
+            <p>
+              <span id="selectedBasketCount">Items in your basket</span>
+              <span class="checklist-progress" id="checklistProgress" aria-live="polite"></span>
+            </p>
+            <ul class="basket-summary" id="selectedBasketSummary" aria-label="Shopping checklist" data-i18n-aria="shoppingChecklist"></ul>
+            <div class="summary-demo-note" data-i18n="demoProductNote">Brand and product matches are illustrative demo suggestions and may not be available at this store.</div>
             <div class="summary-demo-note" data-i18n="demoTravelNote">Store address and prices are illustrative demo data. Check the destination in Maps before travelling.</div>
           </article>
         </div>
@@ -682,18 +717,24 @@
         priceComparison: "Price comparison", shoppingResults: "Your shopping results", bestBasketHeadline: "Here's your best basket",
         comparedNearby: "We compared your list at nearby supermarkets.", editShoppingList: "← Edit shopping list", yourBasket: "Your basket",
         itemsInComparison: "Items in this comparison", itemsBeingCompared: "Items being compared", editList: "Edit list",
+        looseBananas: "loose bananas", groundCoffee: "ground roasted coffee", butterToast: "butter toast", wheatToast: "wheat toast",
         comparingStores: "Comparing stores near you", bestMatch: "Best match for your basket", lowestTotal: "Lowest total",
         smartbuyPick: "SMARTBUY PICK", bestTotalMatch: "Best total price · 98% match", bestPrice: "Best price",
         aldiDistance: "📍 1.3 km away", aldiHours: "Open until 9 PM", forWholeList: "for your whole list",
         savingsAmount: "You save €3.28", savingsCompared: "compared to the average nearby store price.", aldiItemPrices: "ALDI item prices",
         bananas: "Bananas", coffee: "Coffee", bread: "Bread", choose: "Choose", otherNearby: "Other nearby options",
         sortedTotal: "Sorted by total price", lidlHours: "Open until 10 PM", reweHours: "Open until 10 PM", vsBest: "vs. best",
-        details: "Details", hideDetails: "Hide details", samplePrices: "Prices are sample estimates for this demo and may vary by store and location.",
+        details: "Details", hideDetails: "Hide details", samplePrices: "Prices and brand matches are illustrative demo data and may vary by store and location.",
         backToResults: "← Back to supermarket results", storeSummary: "Your store summary", selectedBranchDescription: "Here's your basket and the selected supermarket branch.",
         selectedSupermarket: "Selected supermarket", storeAddress: "Store address", illustrativeAddress: "Illustrative address for this demo",
         openMaps: "Open directions in Google Maps", estimatedTotal: "Estimated total for your basket",
         samplePriceClickdummy: "Sample price for this clickdummy", yourShoppingList: "Your shopping list",
-        selectedBasket: "Selected shopping basket", demoTravelNote: "Store address and prices are illustrative demo data. Check the destination in Maps before travelling.",
+        selectedBasket: "Selected shopping basket", matchedProducts: "Products matched to your list", selectedProducts: "Selected products",
+        shoppingChecklist: "Shopping checklist", checkedProgress: "{checked} of {total} items in your cart",
+        markProductCollected: "Mark {product} as in your cart",
+        productBrandPreview: "Product brand suggestions at this store", brandLabel: "Brand", brandNotSpecified: "Brand not specified",
+        priceUnavailable: "Price unavailable", demoProductNote: "Brand and product matches are illustrative demo suggestions and may not be available at this store.",
+        demoTravelNote: "Store address and prices are illustrative demo data. Check the destination in Maps before travelling.",
         changeLocation: "Change shopping location", locationPrompt: "Enter your city or postal code:", addItemError: "Add at least one item to your list to compare prices.",
         locationFieldLabel: "Your shopping location", locationPlaceholder: "City, postal code, or address",
         saveLocation: "Save location", useCurrentLocation: "Use my current location", locationDemoNote: "Your browser will ask permission to share your location. Store matches and prices are sample data.",
@@ -728,6 +769,7 @@
         priceComparison: "Preisvergleich", shoppingResults: "Deine Suchergebnisse", bestBasketHeadline: "Hier ist dein günstigster Warenkorb",
         comparedNearby: "Wir haben deine Liste bei Supermärkten in der Nähe verglichen.", editShoppingList: "← Einkaufsliste bearbeiten",
         yourBasket: "Dein Warenkorb", itemsInComparison: "Artikel in diesem Preisvergleich", itemsBeingCompared: "Verglichene Artikel",
+        looseBananas: "lose Bananen", groundCoffee: "gemahlener Röstkaffee", butterToast: "Buttertoast", wheatToast: "Weizentoast",
         editList: "Liste bearbeiten", comparingStores: "Märkte in deiner Nähe im Vergleich", bestMatch: "Bester Treffer für deinen Warenkorb",
         lowestTotal: "Niedrigster Gesamtpreis", smartbuyPick: "SMARTBUY-EMPFEHLUNG", bestTotalMatch: "Günstigster Gesamtpreis · 98 % Treffer",
         bestPrice: "Günstigster Preis", aldiDistance: "📍 1,3 km entfernt", aldiHours: "Geöffnet bis 21 Uhr",
@@ -736,13 +778,19 @@
         bananas: "Bananen", coffee: "Kaffee", bread: "Brot", choose: "Auswählen", otherNearby: "Weitere Märkte in der Nähe",
         sortedTotal: "Nach Gesamtpreis sortiert", lidlHours: "Geöffnet bis 22 Uhr", reweHours: "Geöffnet bis 22 Uhr",
         vsBest: "mehr als am günstigsten", details: "Details", hideDetails: "Details ausblenden",
-        samplePrices: "Die Preise sind Beispielwerte und können je nach Markt und Standort abweichen.",
+        samplePrices: "Preise und Marken sind illustrative Beispieldaten und können je nach Markt und Standort abweichen.",
         backToResults: "← Zurück zum Marktvergleich", storeSummary: "Deine Marktübersicht",
         selectedBranchDescription: "Hier findest du deinen Warenkorb und den ausgewählten Supermarkt.",
         selectedSupermarket: "Ausgewählter Supermarkt", storeAddress: "Marktadresse",
         illustrativeAddress: "Beispieladresse für diese Demo", openMaps: "Route in Google Maps öffnen",
         estimatedTotal: "Geschätzter Gesamtpreis für deinen Warenkorb", samplePriceClickdummy: "Beispielpreis für diesen Klickdummy",
         yourShoppingList: "Deine Einkaufsliste", selectedBasket: "Ausgewählter Warenkorb",
+        matchedProducts: "Passende Produkte für deine Einkaufsliste", selectedProducts: "Ausgewählte Produkte",
+        shoppingChecklist: "Einkaufs-Checkliste", checkedProgress: "{checked} von {total} Artikeln im Einkaufswagen",
+        markProductCollected: "{product} als eingekauft markieren",
+        productBrandPreview: "Markenvorschläge für Produkte in diesem Markt", brandLabel: "Marke",
+        brandNotSpecified: "Keine Marke angegeben", priceUnavailable: "Preis nicht verfügbar",
+        demoProductNote: "Marken und Produktvorschläge sind illustrative Beispieldaten und möglicherweise in diesem Markt nicht erhältlich.",
         demoTravelNote: "Marktadresse und Preise sind Beispieldaten. Bitte prüfe das Ziel in Maps, bevor du losfährst.",
         changeLocation: "Standort ändern", locationPrompt: "Stadt oder Postleitzahl eingeben:",
         locationFieldLabel: "Dein Einkaufsstandort", locationPlaceholder: "Stadt, Postleitzahl oder Adresse",
@@ -786,10 +834,36 @@
     const homeLocationInline = document.querySelector("#homeLocationInline");
     const selectedBasketSummary = document.querySelector("#selectedBasketSummary");
     const scanButtonIcon = scanButton.querySelector("svg").outerHTML;
+    const productCategories = [
+      { key: "bananas", matches: /\bbananas?\b|\bbananen?\b/i, icon: "🍌", variant: "looseBananas" },
+      { key: "coffee", matches: /\bcoffee\b|\bkaffee\b/i, icon: "☕", variant: "groundCoffee" },
+      { key: "bread", matches: /\bbread\b|\bbrot\b|\btoast\b/i, icon: "🍞", variant: "wheatToast" }
+    ];
     const stores = {
-      aldi: { name: "ALDI Nord", address: "Musterstraße 1, 33602 Bielefeld", price: "8,47 €", logo: "ALDI", logoClass: "logo-aldi", mapQuery: "ALDI Nord, Musterstraße 1, 33602 Bielefeld (Demoadresse)" },
-      lidl: { name: "Lidl", address: "Beispielweg 2, 33602 Bielefeld", price: "9,15 €", logo: "LIDL", logoClass: "logo-lidl", mapQuery: "Lidl, Beispielweg 2, 33602 Bielefeld (Demoadresse)" },
-      rewe: { name: "REWE", address: "Demoallee 3, 33602 Bielefeld", price: "11,75 €", logo: "REWE", logoClass: "logo-rewe", mapQuery: "REWE, Demoallee 3, 33602 Bielefeld (Demoadresse)" }
+      aldi: {
+        name: "ALDI Nord", address: "Musterstraße 1, 33602 Bielefeld", price: "8,47 €", logo: "ALDI", logoClass: "logo-aldi", mapQuery: "ALDI Nord, Musterstraße 1, 33602 Bielefeld (Demoadresse)",
+        products: {
+          bananas: { brand: "Chiquita", price: "1,25 €", variant: "looseBananas" },
+          coffee: { brand: "Moreno", price: "4,49 €", variant: "groundCoffee" },
+          bread: { brand: "Goldähren", price: "2,73 €", variant: "butterToast" }
+        }
+      },
+      lidl: {
+        name: "Lidl", address: "Beispielweg 2, 33602 Bielefeld", price: "9,15 €", logo: "LIDL", logoClass: "logo-lidl", mapQuery: "Lidl, Beispielweg 2, 33602 Bielefeld (Demoadresse)",
+        products: {
+          bananas: { brand: "Chiquita", price: "1,39 €", variant: "looseBananas" },
+          coffee: { brand: "Bellarom", price: "4,79 €", variant: "groundCoffee" },
+          bread: { brand: "Grafschafter", price: "2,97 €", variant: "wheatToast" }
+        }
+      },
+      rewe: {
+        name: "REWE", address: "Demoallee 3, 33602 Bielefeld", price: "11,75 €", logo: "REWE", logoClass: "logo-rewe", mapQuery: "REWE, Demoallee 3, 33602 Bielefeld (Demoadresse)",
+        products: {
+          bananas: { brand: "Chiquita", price: "1,69 €", variant: "looseBananas" },
+          coffee: { brand: "Jacobs Krönung", price: "6,29 €", variant: "groundCoffee" },
+          bread: { brand: "Harry", price: "3,77 €", variant: "wheatToast" }
+        }
+      }
     };
 
     function getItems() {
@@ -858,20 +932,109 @@
       basketSummary.replaceChildren();
 
       items.forEach((item) => {
-        const match = item.match(/^(\d+(?:\.\d+)?\s*(?:x|×)?\s+)(.+)$/i);
+        const { quantity, name } = splitRequestedItem(item);
         const row = document.createElement("li");
-        if (match) {
+        if (quantity) {
           const quantity = document.createElement("span");
           quantity.className = "basket-quantity";
-          quantity.textContent = match[1].trim();
-          const name = document.createElement("span");
-          name.textContent = match[2].trim();
-          row.append(quantity, name);
-        } else {
-          row.textContent = item;
+          quantity.textContent = splitRequestedItem(item).quantity;
+          row.append(quantity);
         }
+        const requestedName = document.createElement("span");
+        requestedName.textContent = name;
+        row.append(requestedName);
         basketSummary.append(row);
       });
+      renderProductComparisons();
+    }
+
+    function splitRequestedItem(item) {
+      const match = item.match(/^(\d+(?:[.,]\d+)?\s*(?:x|×)?\s+)(.+)$/i);
+      return {
+        quantity: match?.[1].trim() || "",
+        name: (match?.[2] || item).trim()
+      };
+    }
+
+    function getProductMatch(item, storeId) {
+      const { name, quantity } = splitRequestedItem(item);
+      const category = productCategories.find((candidate) => candidate.matches.test(name));
+      const product = category ? stores[storeId].products[category.key] : null;
+      return {
+        name,
+        quantity,
+        category,
+        brand: product?.brand || text("brandNotSpecified"),
+        variant: product ? text(product.variant) : name,
+        price: product?.price || text("priceUnavailable"),
+        matched: Boolean(product)
+      };
+    }
+
+    function renderProductComparisons() {
+      const aldiProducts = document.querySelector("#aldiProducts");
+      aldiProducts.replaceChildren();
+      const items = getItems();
+
+      items.forEach((item) => {
+        const match = getProductMatch(item, "aldi");
+        const row = document.createElement("div");
+        row.className = "item-price";
+        const icon = document.createElement("span");
+        icon.className = "item-price-icon";
+        icon.setAttribute("aria-hidden", "true");
+        icon.textContent = match.category?.icon || "🛒";
+        const info = document.createElement("span");
+        info.className = "item-price-info";
+        const name = document.createElement("span");
+        name.className = "item-price-name";
+        name.textContent = match.category ? text(match.category.key) : match.name;
+        const brand = document.createElement("span");
+        brand.className = "item-price-brand";
+        brand.textContent = match.matched
+          ? `${text("brandLabel")}: ${match.brand} · ${match.variant}`
+          : `${text("brandLabel")}: ${text("brandNotSpecified")}`;
+        info.append(name, brand);
+        const price = document.createElement("span");
+        price.className = "item-price-amount";
+        price.textContent = match.price;
+        row.append(icon, info, price);
+        aldiProducts.append(row);
+      });
+
+      for (const storeId of ["lidl", "rewe"]) {
+        const preview = document.querySelector(`#${storeId}BrandPreview`);
+        const breakdown = document.querySelector(`#${storeId}Breakdown`);
+        preview.replaceChildren();
+        breakdown.replaceChildren();
+
+        items.forEach((item) => {
+          const match = getProductMatch(item, storeId);
+          const previewChip = document.createElement("span");
+          previewChip.className = "brand-preview-chip";
+          const previewBrand = document.createElement("strong");
+          previewBrand.textContent = match.brand;
+          previewChip.append(previewBrand, document.createTextNode(` · ${match.category ? text(match.category.key) : match.name}`));
+          preview.append(previewChip);
+
+          const row = document.createElement("div");
+          row.className = "store-breakdown-row";
+          const product = document.createElement("span");
+          product.className = "store-breakdown-name";
+          product.append(document.createTextNode(match.category ? text(match.category.key) : match.name));
+          const brand = document.createElement("span");
+          brand.className = "store-breakdown-product";
+          brand.textContent = match.matched
+            ? `${text("brandLabel")}: ${match.brand} · ${match.variant}`
+            : `${text("brandLabel")}: ${text("brandNotSpecified")}`;
+          product.append(brand);
+          const price = document.createElement("span");
+          price.className = "store-breakdown-price";
+          price.textContent = match.price;
+          row.append(product, price);
+          breakdown.append(row);
+        });
+      }
     }
 
     function renderResultsDescription() {
@@ -905,6 +1068,20 @@
       if (view === "stores") document.querySelector("#stores").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
+    function checklistStorageKey(storeId, index, match) {
+      const productKey = match.category?.key || match.name.toLocaleLowerCase();
+      return `smartbuy-checklist:${storeId}:${encodeURIComponent(`${index}:${match.quantity.toLocaleLowerCase()}:${productKey}`)}`;
+    }
+
+    function updateChecklistProgress() {
+      const checkboxes = [...selectedBasketSummary.querySelectorAll('input[type="checkbox"]')];
+      const checked = checkboxes.filter((checkbox) => checkbox.checked).length;
+      document.querySelector("#checklistProgress").textContent = text("checkedProgress", {
+        checked,
+        total: checkboxes.length
+      });
+    }
+
     function renderStoreSummary(storeId) {
       const store = stores[storeId];
       if (!store) return;
@@ -920,7 +1097,55 @@
         count: getItems().length,
         items: getItems().length === 1 ? text("item") : text("items")
       });
-      selectedBasketSummary.replaceChildren(...Array.from(basketSummary.children, (row) => row.cloneNode(true)));
+      selectedBasketSummary.replaceChildren();
+      getItems().forEach((item, index) => {
+        const match = getProductMatch(item, storeId);
+        const checklistKey = checklistStorageKey(storeId, index, match);
+        const row = document.createElement("li");
+        row.className = "basket-check-row";
+        if (match.quantity) {
+          const quantity = document.createElement("span");
+          quantity.className = "basket-quantity";
+          quantity.textContent = match.quantity;
+          row.append(quantity);
+        }
+        const label = document.createElement("label");
+        label.className = "checklist-item";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = localStorage.getItem(checklistKey) === "true";
+        const brandIcon = document.createElement("span");
+        const brandSlug = match.matched
+          ? match.brand.toLocaleLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+          : "";
+        brandIcon.className = `checklist-brand-icon${brandSlug ? ` brand-${brandSlug}` : ""}`;
+        brandIcon.setAttribute("aria-hidden", "true");
+        brandIcon.textContent = match.matched
+          ? match.brand.split(/\s+/).slice(0, 2).map((word) => word[0]).join("").slice(0, 2).toLocaleUpperCase()
+          : "🛒";
+        const productInfo = document.createElement("span");
+        productInfo.className = "checklist-item-info";
+        const name = document.createElement("span");
+        name.className = "checklist-item-name";
+        name.textContent = match.category ? text(match.category.key) : match.name;
+        const brand = document.createElement("span");
+        brand.className = "checklist-item-product";
+        brand.textContent = match.matched
+          ? `${text("brandLabel")}: ${match.brand} · ${match.variant}`
+          : `${text("brandLabel")}: ${text("brandNotSpecified")}`;
+        productInfo.append(name, brand);
+        label.append(checkbox, brandIcon, productInfo);
+        const price = document.createElement("span");
+        price.className = "checklist-item-price";
+        price.textContent = match.price;
+        checkbox.setAttribute("aria-label", text("markProductCollected", {
+          product: match.category ? text(match.category.key) : match.name
+        }));
+        label.append(price);
+        row.append(label);
+        selectedBasketSummary.append(row);
+      });
+      updateChecklistProgress();
       document.querySelector("#breadcrumbCurrent").textContent = store.name;
       document.querySelector("#storeSummaryTitle").textContent = text("shoppingAt", { store: store.name });
     }
@@ -932,6 +1157,19 @@
     }
 
     shoppingList.addEventListener("input", updateItemCount);
+    selectedBasketSummary.addEventListener("change", (event) => {
+      const checkbox = event.target;
+      if (!(checkbox instanceof HTMLInputElement) || checkbox.type !== "checkbox") return;
+      const storeId = window.history.state?.storeId || window.location.hash.match(/^#store-(.+)$/)?.[1];
+      if (!storeId || !stores[storeId]) return;
+      const rowIndex = [...selectedBasketSummary.querySelectorAll('input[type="checkbox"]')].indexOf(checkbox);
+      const item = getItems()[rowIndex];
+      if (item === undefined) return;
+      const key = checklistStorageKey(storeId, rowIndex, getProductMatch(item, storeId));
+      if (checkbox.checked) localStorage.setItem(key, "true");
+      else localStorage.removeItem(key);
+      updateChecklistProgress();
+    });
 
     scanButton.addEventListener("click", () => {
       const items = getItems();
