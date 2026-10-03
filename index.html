@@ -180,8 +180,8 @@
     .checklist-item-name { color: #3e483f; font-size: 11px; font-weight: 650; overflow-wrap: anywhere; }
     .checklist-item-product { color: #788078; font-size: 9px; font-weight: 450; overflow-wrap: anywhere; }
     .checklist-item-price { min-width: 62px; margin-left: auto; color: #3e483f; font-size: 10px; font-weight: 650; text-align: right; white-space: nowrap; }
-    .checklist-item input:checked + .checklist-item-info .checklist-item-name { color: #929990; text-decoration: line-through; }
-    .checklist-item input:checked + .checklist-item-info .checklist-item-product { color: #a0a69f; }
+    .checklist-item input:checked ~ .checklist-item-info .checklist-item-name { color: #929990; text-decoration: line-through; }
+    .checklist-item input:checked ~ .checklist-item-info .checklist-item-product { color: #a0a69f; }
     .selected-basket-card > p { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .checklist-progress { color: var(--green); font-weight: 700; white-space: nowrap; }
     .basket-item-main { display: grid; gap: 3px; min-width: 0; }
@@ -595,9 +595,9 @@
                 <div class="store-name-line"><span class="store-name">ALDI Nord</span><span class="best-tag" data-i18n="bestPrice">Best price</span></div>
                 <div class="store-details"><span data-i18n="aldiDistance">📍 1,3 km entfernt</span><span class="dot">·</span><span data-i18n="aldiHours">Geöffnet bis 21 Uhr</span></div>
               </div>
-              <div class="price-block"><div class="price">8,47&nbsp;€</div><div class="price-label" data-i18n="forWholeList">for your whole list</div></div>
+              <div class="price-block"><div class="price" id="aldiTotal">—</div><div class="price-label" id="aldiPriceLabel" data-i18n="forWholeList">for your whole list</div></div>
             </div>
-            <div class="savings-note"><strong data-i18n="savingsAmount">You save 3,28&nbsp;€</strong> <span data-i18n="savingsCompared">compared to the average nearby store price.</span></div>
+            <div class="savings-note"><strong id="savingsAmount" data-i18n="savingsAmount">You save —</strong> <span data-i18n="savingsCompared">compared to the average nearby store price.</span></div>
             <div class="item-prices" id="aldiProducts" aria-label="ALDI item prices" data-i18n-aria="aldiItemPrices"></div>
             <div class="choose-store-row">
               <button class="choose-store-button" type="button" data-store="aldi"><span data-i18n="choose">Choose</span> ALDI Nord</button>
@@ -616,7 +616,7 @@
               </div>
               <div class="store-brand-preview" id="lidlBrandPreview" aria-label="Lidl product brands" data-i18n-aria="productBrandPreview"></div>
               <div class="store-card-bottom">
-                <div><div class="price">9,15&nbsp;€</div><div class="diff">+0,68&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
+                <div><div class="price" id="lidlTotal">—</div><div class="diff" id="lidlDiff">—</div></div>
                 <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
@@ -634,7 +634,7 @@
               </div>
               <div class="store-brand-preview" id="reweBrandPreview" aria-label="REWE product brands" data-i18n-aria="productBrandPreview"></div>
               <div class="store-card-bottom">
-                <div><div class="price">11,75&nbsp;€</div><div class="diff">+3,28&nbsp;€ <span data-i18n="vsBest">vs. best</span></div></div>
+                <div><div class="price" id="reweTotal">—</div><div class="diff" id="reweDiff">—</div></div>
                 <button class="details-button" type="button" aria-expanded="false"><span data-i18n="details">Details</span>
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </button>
@@ -721,7 +721,7 @@
         comparingStores: "Comparing stores near you", bestMatch: "Best match for your basket", lowestTotal: "Lowest total",
         smartbuyPick: "SMARTBUY PICK", bestTotalMatch: "Best total price · 98% match", bestPrice: "Best price",
         aldiDistance: "📍 1.3 km away", aldiHours: "Open until 9 PM", forWholeList: "for your whole list",
-        savingsAmount: "You save €3.28", savingsCompared: "compared to the average nearby store price.", aldiItemPrices: "ALDI item prices",
+        savingsAmount: "You save {amount}", savingsCompared: "compared to the average nearby store price.", aldiItemPrices: "ALDI item prices",
         bananas: "Bananas", coffee: "Coffee", bread: "Bread", choose: "Choose", otherNearby: "Other nearby options",
         sortedTotal: "Sorted by total price", lidlHours: "Open until 10 PM", reweHours: "Open until 10 PM", vsBest: "vs. best",
         details: "Details", hideDetails: "Hide details", samplePrices: "Prices and brand matches are illustrative demo data and may vary by store and location.",
@@ -773,7 +773,7 @@
         editList: "Liste bearbeiten", comparingStores: "Märkte in deiner Nähe im Vergleich", bestMatch: "Bester Treffer für deinen Warenkorb",
         lowestTotal: "Niedrigster Gesamtpreis", smartbuyPick: "SMARTBUY-EMPFEHLUNG", bestTotalMatch: "Günstigster Gesamtpreis · 98 % Treffer",
         bestPrice: "Günstigster Preis", aldiDistance: "📍 1,3 km entfernt", aldiHours: "Geöffnet bis 21 Uhr",
-        forWholeList: "für deine gesamte Liste", savingsAmount: "Du sparst 3,28 €",
+        forWholeList: "für deine gesamte Liste", savingsAmount: "Du sparst {amount}",
         savingsCompared: "im Vergleich zum durchschnittlichen Preis in deiner Nähe.", aldiItemPrices: "ALDI-Artikelpreise",
         bananas: "Bananen", coffee: "Kaffee", bread: "Brot", choose: "Auswählen", otherNearby: "Weitere Märkte in der Nähe",
         sortedTotal: "Nach Gesamtpreis sortiert", lidlHours: "Geöffnet bis 22 Uhr", reweHours: "Geöffnet bis 22 Uhr",
@@ -841,27 +841,27 @@
     ];
     const stores = {
       aldi: {
-        name: "ALDI Nord", address: "Musterstraße 1, 33602 Bielefeld", price: "8,47 €", logo: "ALDI", logoClass: "logo-aldi", mapQuery: "ALDI Nord, Musterstraße 1, 33602 Bielefeld (Demoadresse)",
+        name: "ALDI Nord", address: "Musterstraße 1, 33602 Bielefeld", logo: "ALDI", logoClass: "logo-aldi", mapQuery: "ALDI Nord, Musterstraße 1, 33602 Bielefeld (Demoadresse)",
         products: {
-          bananas: { brand: "Chiquita", price: "1,25 €", variant: "looseBananas" },
-          coffee: { brand: "Moreno", price: "4,49 €", variant: "groundCoffee" },
-          bread: { brand: "Goldähren", price: "2,73 €", variant: "butterToast" }
+          bananas: { brand: "Chiquita", priceCents: 125, variant: "looseBananas" },
+          coffee: { brand: "Moreno", priceCents: 449, variant: "groundCoffee" },
+          bread: { brand: "Goldähren", priceCents: 273, variant: "butterToast" }
         }
       },
       lidl: {
-        name: "Lidl", address: "Beispielweg 2, 33602 Bielefeld", price: "9,15 €", logo: "LIDL", logoClass: "logo-lidl", mapQuery: "Lidl, Beispielweg 2, 33602 Bielefeld (Demoadresse)",
+        name: "Lidl", address: "Beispielweg 2, 33602 Bielefeld", logo: "LIDL", logoClass: "logo-lidl", mapQuery: "Lidl, Beispielweg 2, 33602 Bielefeld (Demoadresse)",
         products: {
-          bananas: { brand: "Chiquita", price: "1,39 €", variant: "looseBananas" },
-          coffee: { brand: "Bellarom", price: "4,79 €", variant: "groundCoffee" },
-          bread: { brand: "Grafschafter", price: "2,97 €", variant: "wheatToast" }
+          bananas: { brand: "Chiquita", priceCents: 139, variant: "looseBananas" },
+          coffee: { brand: "Bellarom", priceCents: 479, variant: "groundCoffee" },
+          bread: { brand: "Grafschafter", priceCents: 297, variant: "wheatToast" }
         }
       },
       rewe: {
-        name: "REWE", address: "Demoallee 3, 33602 Bielefeld", price: "11,75 €", logo: "REWE", logoClass: "logo-rewe", mapQuery: "REWE, Demoallee 3, 33602 Bielefeld (Demoadresse)",
+        name: "REWE", address: "Demoallee 3, 33602 Bielefeld", logo: "REWE", logoClass: "logo-rewe", mapQuery: "REWE, Demoallee 3, 33602 Bielefeld (Demoadresse)",
         products: {
-          bananas: { brand: "Chiquita", price: "1,69 €", variant: "looseBananas" },
-          coffee: { brand: "Jacobs Krönung", price: "6,29 €", variant: "groundCoffee" },
-          bread: { brand: "Harry", price: "3,77 €", variant: "wheatToast" }
+          bananas: { brand: "Chiquita", priceCents: 169, variant: "looseBananas" },
+          coffee: { brand: "Jacobs Krönung", priceCents: 629, variant: "groundCoffee" },
+          bread: { brand: "Harry", priceCents: 377, variant: "wheatToast" }
         }
       }
     };
@@ -872,6 +872,13 @@
 
     function text(key, values = {}) {
       return translations[activeLanguage][key].replace(/\{(\w+)\}/g, (_, name) => values[name] ?? "");
+    }
+
+    function formatCurrency(cents) {
+      return new Intl.NumberFormat(activeLanguage === "de" ? "de-DE" : "en-IE", {
+        style: "currency",
+        currency: "EUR"
+      }).format(cents / 100);
     }
 
     function applyLanguage() {
@@ -960,14 +967,27 @@
       const { name, quantity } = splitRequestedItem(item);
       const category = productCategories.find((candidate) => candidate.matches.test(name));
       const product = category ? stores[storeId].products[category.key] : null;
+      const quantityValue = quantity ? Number.parseFloat(quantity.replace(",", ".")) : 1;
+      const lineTotalCents = product ? Math.round(product.priceCents * (Number.isFinite(quantityValue) ? quantityValue : 1)) : null;
       return {
         name,
         quantity,
+        quantityValue,
         category,
         brand: product?.brand || text("brandNotSpecified"),
         variant: product ? text(product.variant) : name,
-        price: product?.price || text("priceUnavailable"),
+        lineTotalCents,
+        price: product ? formatCurrency(lineTotalCents) : text("priceUnavailable"),
         matched: Boolean(product)
+      };
+    }
+
+    function getBasketTotal(storeId) {
+      const matches = getItems().map((item) => getProductMatch(item, storeId));
+      const unavailableCount = matches.filter((match) => !match.matched).length;
+      return {
+        cents: unavailableCount ? null : matches.reduce((total, match) => total + match.lineTotalCents, 0),
+        unavailableCount
       };
     }
 
@@ -975,6 +995,31 @@
       const aldiProducts = document.querySelector("#aldiProducts");
       aldiProducts.replaceChildren();
       const items = getItems();
+
+      const totals = Object.fromEntries(["aldi", "lidl", "rewe"].map((storeId) => [storeId, getBasketTotal(storeId)]));
+      for (const storeId of ["aldi", "lidl", "rewe"]) {
+        document.querySelector(`#${storeId}Total`).textContent = totals[storeId].cents === null
+          ? text("priceUnavailable")
+          : formatCurrency(totals[storeId].cents);
+      }
+      document.querySelector("#aldiPriceLabel").textContent = text(
+        totals.aldi.unavailableCount ? "priceUnavailable" : "forWholeList"
+      );
+      document.querySelector("#lidlDiff").textContent = totals.lidl.cents === null || totals.aldi.cents === null
+        ? text("priceUnavailable")
+        : `${formatCurrency(totals.lidl.cents - totals.aldi.cents)} ${text("vsBest")}`;
+      document.querySelector("#reweDiff").textContent = totals.rewe.cents === null || totals.aldi.cents === null
+        ? text("priceUnavailable")
+        : `${formatCurrency(totals.rewe.cents - totals.aldi.cents)} ${text("vsBest")}`;
+      const savingsAmount = document.querySelector("#savingsAmount");
+      if (Object.values(totals).some((total) => total.cents === null)) {
+        savingsAmount.textContent = text("priceUnavailable");
+      } else {
+        const averageCents = Math.round(Object.values(totals).reduce((sum, total) => sum + total.cents, 0) / 3);
+        savingsAmount.textContent = text("savingsAmount", {
+          amount: formatCurrency(averageCents - totals.aldi.cents)
+        });
+      }
 
       items.forEach((item) => {
         const match = getProductMatch(item, "aldi");
@@ -1091,7 +1136,10 @@
       logo.textContent = store.logo;
       document.querySelector("#selectedStoreName").textContent = store.name;
       document.querySelector("#selectedStoreAddress").textContent = store.address;
-      document.querySelector("#selectedStorePrice").textContent = store.price;
+      const basketTotal = getBasketTotal(storeId);
+      document.querySelector("#selectedStorePrice").textContent = basketTotal.cents === null
+        ? text("priceUnavailable")
+        : formatCurrency(basketTotal.cents);
       document.querySelector("#directionsLink").href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(store.mapQuery)}`;
       document.querySelector("#selectedBasketCount").textContent = text("selectedItems", {
         count: getItems().length,
